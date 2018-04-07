@@ -41,6 +41,16 @@ def getFilters(filters):
                 getattr(E, 'ipv4-source')(filters['ip']['source'])
             )
 
+    if ('udp' in filters):
+        if ('source-port' in filters['udp']):
+            clause.append(
+                getattr(E, 'udp-source-port')(filters['udp']['source-port'])
+            )
+        if ('destination-port' in filters['udp']):
+            clause.append(
+                getattr(E, 'udp-destination-port')(filters['udp']['destination-port'])
+            )
+
     return clause
 
 def getInstructions(instructions):
@@ -58,6 +68,14 @@ def getInstructions(instructions):
         if ('output' in action):
             actionClause = getattr(E, 'output-action')(
                 getattr(E, 'output-node-connector')(action['output'])
+            )
+        if ('udp-dst-port' in action):
+            actionClause = getattr(E, 'set-field')(
+                getattr(E, 'udp-destination-port')(action['udp-dst-port'])
+            )
+        if ('udp-src-port' in action):
+            actionClause = getattr(E, 'set-field')(
+                getattr(E, 'udp-source-port')(action['udp-src-port'])
             )
         actions.append(
             E.action(

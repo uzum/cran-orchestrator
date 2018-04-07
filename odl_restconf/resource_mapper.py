@@ -56,6 +56,41 @@ class ResourceMapper():
 
         return { 'switches': switches, 'hosts': hosts }
 
+    def addUDPForwardingFlow(self, switch, decoy, target, options={}):
+        if ('filter' not in options):
+            raise LookupError('filter is required for forwarding flows')
+
+        print('Forwarding UDP packets:')
+        print('\tintended for: ' + decoy.ip + ':' + options['filter']['destination-port'])
+        print('\tsending to: ' + target.ip + ':' + options['target-port'])
+        flow = Flow({
+            'switch': switch.id,
+            'priority': options.get('priority', '65535'),
+            'hard-timeout': options.get('hard-timeout', '0'),
+            'idle-timeout': options.get('idle-timeout', '0'),
+            'table_id': options.get('table_id', '0'),
+            'filters': {
+                'ethernet': '2048',
+                'ip': {
+                    'protocol': options.get('protocol', 'udp'),
+                    'destination': decoy.ip + '/32'
+                },
+                'udp': options['filter']
+            },
+            'instructions': [{
+                'ip-destination': target.ip + '/32'
+            }, {
+                'mac-destination': target.mac
+            }, {
+                'udp-dst-port': options['target-port']
+            }, {
+                'output': 'NORMAL'
+            }]
+        })
+        self.api.addFlow(flow)
+        self.flows.append(flow)
+        return flow
+
     def addRedirectFlow(self, switch, fromHost, toHost, options={}):
         print('Redirecting target packets from ' + fromHost.mac + ' to ' + toHost.mac)
         flow = Flow({
