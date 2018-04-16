@@ -1,0 +1,11 @@
+# Need to use SSH Tunneling from port 80 to 8080
+# This script takes the password as parameter
+export OS_IDENTITY_API_VERSION=3
+export OS_AUTH_URL=http://localhost:8080/identity
+export OS_USERNAME=admin
+export OS_USER_DOMAIN_NAME=default
+export OS_TENANT_NAME=admin
+export OS_PASSWORD=$1
+export OS_PROJECT_NAME=admin
+export OS_PROJECT_DOMAIN_NAME=default
+export OS_REGION_NAME=RegionOne
