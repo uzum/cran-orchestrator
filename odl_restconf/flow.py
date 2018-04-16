@@ -2,10 +2,6 @@ from lxml.builder import E
 from lxml.etree import tostring
 from lxml.etree import Element
 
-HARD_TIMEOUT = getattr(E, 'hard-timeout')
-IDLE_TIMEOUT = getattr(E, 'idle-timeout')
-TABLE_ID = getattr(E, 'table_id')
-
 PROTOCOL_MAP = {
     'udp': '17',
     'icmp': '1'
@@ -61,22 +57,28 @@ def getInstructions(instructions):
             actionClause = getattr(E, 'set-nw-dst-action')(
                 getattr(E, 'ipv4-address')(action['ip-destination'])
             )
-        if ('mac-destination' in action):
+        elif ('mac-destination' in action):
             actionClause = getattr(E, 'set-dl-dst-action')(
                 getattr(E, 'address')(action['mac-destination'])
             )
-        if ('output' in action):
+        elif ('output' in action):
             actionClause = getattr(E, 'output-action')(
                 getattr(E, 'output-node-connector')(action['output'])
             )
-        if ('udp-dst-port' in action):
+        elif ('udp-dst-port' in action):
             actionClause = getattr(E, 'set-field')(
                 getattr(E, 'udp-destination-port')(action['udp-dst-port'])
             )
-        if ('udp-src-port' in action):
+        elif ('udp-src-port' in action):
             actionClause = getattr(E, 'set-field')(
                 getattr(E, 'udp-source-port')(action['udp-src-port'])
             )
+        elif ('group-id' in action):
+            actionClause = getattr(E, 'group-action')(
+                getattr(E, 'group-id')(action['group-id'])
+            )
+        else:
+            raise NotImplementedError('Unsupported action type')
         actions.append(
             E.action(
                 E.order(str(index)),
@@ -101,17 +103,17 @@ class Flow():
 
     def xml(self):
         return tostring(E.input(
-                E.barrier('false'),
-                getTargetSwitch(self.options.get('switch')),
-                E.cookie(str(self.id)),
-                E.flags('SEND_FLOW_REM'),
-                HARD_TIMEOUT(self.options.get('hard-timeout')),
-                IDLE_TIMEOUT(self.options.get('idle-timeout')),
-                E.installHw('false'),
-                getFilters(self.options.get('filters')),
-                getInstructions(self.options.get('instructions')),
-                E.priority(self.options.get('priority')),
-                E.strict('false'),
-                TABLE_ID(self.options.get('table_id')),
-                xmlns='urn:opendaylight:flow:service'
-               ), xml_declaration=True, encoding='UTF-8')
+            E.barrier('false'),
+            getTargetSwitch(self.options.get('switch')),
+            E.cookie(str(self.id)),
+            E.flags('SEND_FLOW_REM'),
+            getattr(E, 'hard-timeout')(self.options.get('hard-timeout')),
+            getattr(E, 'idle-timeout')(self.options.get('idle-timeout')),
+            E.installHw('false'),
+            getFilters(self.options.get('filters')),
+            getInstructions(self.options.get('instructions')),
+            E.priority(self.options.get('priority')),
+            E.strict('false'),
+            getattr(E, 'table_id')(self.options.get('table_id')),
+            xmlns='urn:opendaylight:flow:service'
+           ), xml_declaration=True, encoding='UTF-8')
