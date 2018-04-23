@@ -1,60 +1,60 @@
-from .api import ODLRestConfAPI
-from .flow import Flow
+from api import ODLRestConfAPI
+from flow import Flow
+from topology import Topology
+from mapping import Mapping
 
-class Switch():
-    def __init__(self, id):
-        self.id = id
-        self.hosts = []
-
-    def addHost(self, host):
-        self.hosts.append(host)
-
-class Host():
-    def __init__(self, parameters):
-        self.id = parameters['id']
-        self.mac = parameters['mac']
-        self.ip = parameters['ip']
+class Mapping():
+    def __init__(self, rrhId, bbuList):
+        self.rrhId = rrhId
+        self.bbuList = bbuList
+        self.flows = []
+        self.groups = []
 
 class ResourceMapper():
     def __init__(self):
         self.api = ODLRestConfAPI()
-        self.topo = self.discoverTopology()
-        self.flows = []
-        self.printTopology()
 
-    def printTopology(self):
-        print('Switches:')
-        for switch in self.topo['switches']:
-            print('\t' + switch.id)
-            print('\tConnected hosts:')
-            for host in switch.hosts:
-                print('\t\t' + host.ip + "/" + host.mac)
-        print('Hosts:')
-        for host in self.topo['hosts']:
-            print('\t' + host.ip + "/" + host.mac)
+        self.topology = Topology()
+        self.topology.discover(self.api.topology())
+        self.topology.print()
 
-    def discoverTopology(self):
-        switches = []
-        hosts = []
+        self.mappings = []
 
-        response = self.api.topology()
-        topology = response.json()['network-topology']['topology'][0]
-        for node in topology['node']:
-            if (node['node-id'].startswith('host')):
-                host = Host(node['host-tracker-service:addresses'][0])
-                hosts.append(host)
+    def setControllerNodeSwitch(self, switchId):
+        self.topology.setControllerNodeSwitch(switchId)
 
-        for node in topology['node']:
-            if (node['node-id'].startswith('openflow')):
-                switch = Switch(node['node-id'])
-                for link in topology['link']:
-                    if (link['source']['source-node'] == node['node-id']):
-                        for host in hosts:
-                            if host.mac == link['destination']['dest-node'][5:]:
-                                switch.addHost(host)
-                switches.append(switch)
+    def addMapping(self, rrhId, bbuList):
+        mapping = Mapping(rrhId, bbuList)
+        targetSwitches = self.topology.getTargetNodes(bbuList)
+        if (len(targetSwitches) == 1):
+            flow = self.addForwardingFlow()
+            mapping.flows.append(flow)
+        else:
+            group = self.addReplicationGroup()
+            flow = self.addForwardingFlow()
+            mapping.groups.append(group)
+            mapping.flows.append(flow)
 
-        return { 'switches': switches, 'hosts': hosts }
+        for switch in targetSwitches:
+            if (len(switch['hosts']) == 1):
+                flow = self.addForwardingFlow()
+                mapping.flows.append(flow)
+            else:
+                group = self.addReplicationGroup()
+                flow = self.addForwardingFlow()
+                mapping.groups.append(group)
+                mapping.flows.append(flow)
+        self.mappings.append(mapping)
+
+    def onBBUMigration(self, bbuId):
+        self.topology.discover(self.api.topology())
+        for mapping in self.mappings:
+            if bbuId in mapping.bbuList:
+                for flow in mapping.flows:
+                    self.removeFlow(flow)
+                for group in mapping.groups:
+                    self.removeGroup(group)
+                self.addMapping(mapping.rrhId, mapping.bbuList)
 
     def addUDPForwardingFlow(self, switch, decoy, target, options={}):
         if ('filter' not in options):
@@ -119,6 +119,7 @@ class ResourceMapper():
         return flow
 
     def removeFlow(self, flow):
-        if flow in self.flows:
-            self.api.removeFlow(flow)
-            self.flows.remove(flow)
+        self.api.removeFlow(flow)
+
+    def removeGroup(self, group):
+        self.api.removeGroup(group)
