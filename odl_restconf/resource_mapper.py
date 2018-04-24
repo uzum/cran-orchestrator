@@ -196,6 +196,12 @@ class ResourceMapper():
         return mapping
 
     def removeMapping(self, id):
+        for mapping in self.mappings:
+            if mapping.id == id:
+                for flow in mapping.flows:
+                    self.removeFlow(flow)
+                for group in mapping.groups:
+                    self.removeGroup(group)
         self.mappings = [mapping for mapping in self.mappings if mapping.id != id]
 
     def onBBUMigration(self, bbuId):
