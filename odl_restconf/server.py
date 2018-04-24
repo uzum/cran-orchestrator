@@ -14,6 +14,11 @@ def addMapping():
     bbus = request.args.get('bbus')
     return "mapping: from " + rrh + " to " + bbus
 
+@app.route("/mapping/<id>/remove", methods=['POST'])
+def removeMapping(id):
+    rm.removeMapping(id)
+    return "OK"
+
 class Server():
     def run(self):
         app.run()

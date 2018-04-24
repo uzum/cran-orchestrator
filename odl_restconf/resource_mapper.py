@@ -5,7 +5,11 @@ from .config import *
 from .topology import Topology
 
 class Mapping():
+    nextMappingId = 0
+
     def __init__(self, rrhId, bbuList):
+        self.id = Mapping.nextMappingId
+        Mapping.nextMappingId = Mapping.nextMappingId + 1
         self.rrhId = rrhId
         self.bbuList = bbuList
         self.flows = []
@@ -16,8 +20,8 @@ class ResourceMapper():
         self.api = ODLRestConfAPI()
 
         self.topology = Topology()
-        # self.topology.discover(self.api.topology())
-        # self.topology.display()
+        self.topology.discover(self.api.topology())
+        self.topology.display()
 
         self.mappings = []
 
@@ -170,6 +174,9 @@ class ResourceMapper():
                 mapping.groups.append(group)
                 mapping.flows.append(flow)
         self.mappings.append(mapping)
+
+    def removeMapping(self, id):
+        self.mappings = [mapping for mapping in self.mappings if mapping.id != id]
 
     def onBBUMigration(self, bbuId):
         self.topology.discover(self.api.topology())
