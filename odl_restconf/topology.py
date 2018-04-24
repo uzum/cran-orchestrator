@@ -25,16 +25,16 @@ class Topology():
     def display(self):
         if (self.controllerNodeSwitch):
             print('Controller Node: ')
-            print('\t' + switch.id)
+            print('\t' + self.controllerNodeSwitch.id)
             print('\tConnected hosts: ')
             for host in self.controllerNodeSwitch.hosts:
-                print('\t\t' + host.ip + "/" + host.mac)
+                print('\t\tHost#' + str(host.id) + ' | ' + host.ip + "/" + host.mac)
         print('Compute Nodes:')
         for switch in self.computeNodeSwitches:
             print('\t' + switch.id)
             print('\tConnected hosts:')
             for host in switch.hosts:
-                print('\t\t' + host.ip + "/" + host.mac)
+                print('\t\tHost#' + str(host.id) + ' | ' + host.ip + "/" + host.mac)
 
     def findHost(self, id):
         for switch in self.computeNodeSwitches:
@@ -58,7 +58,8 @@ class Topology():
                         for host in hosts:
                             if host.mac == link['destination']['dest-node'][5:]:
                                 switch.addHost(host)
-                self.computeNodeSwitches.append(switch)
+                if (self.controllerNodeSwitch == None or self.controllerNodeSwitch.id != switch.id):
+                    self.computeNodeSwitches.append(switch)
 
     def setControllerNodeSwitch(self, id):
         for switch in self.computeNodeSwitches:
