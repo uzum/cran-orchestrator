@@ -50,7 +50,7 @@ class ResourceMapper():
                     'ethernet': '2048',
                     'ip': {
                         'protocol': 'udp',
-                        'destination': self.topology.controllerNodeSwitch.getForwardingAddress().ip
+                        'destination': self.topology.controllerNodeSwitch.getForwardingAddress().ip + '/32'
                     },
                     'udp': {
                         'destination-port': str(rrhId + RRH_BASE_PORT)
@@ -58,7 +58,7 @@ class ResourceMapper():
                 },
                 # instructions
                 [{
-                    'ip-destination': targetSwitch[0].getForwardingAddress().ip
+                    'ip-destination': targetSwitch[0].getForwardingAddress().ip + '/32'
                 }, {
                     'mac-destination': targetSwitch[0].getForwardingAddress().mac
                 }],
@@ -73,7 +73,7 @@ class ResourceMapper():
             for targetSwitch in targetSwitches:
                 buckets.append({
                     'instructions': [{
-                        'ip-destination': targetSwitch.getForwardingAddress().ip
+                        'ip-destination': targetSwitch.getForwardingAddress().ip + '/32'
                     }, {
                         'mac-destination': targetSwitch.getForwardingAddress().mac
                     }]
@@ -90,7 +90,7 @@ class ResourceMapper():
                     'ethernet': '2048',
                     'ip': {
                         'protocol': 'udp',
-                        'destination': self.topology.controllerNodeSwitch.getForwardingAddress().ip
+                        'destination': self.topology.controllerNodeSwitch.getForwardingAddress().ip + '/32'
                     },
                     'udp': {
                         'destination-port': str(rrhId + RRH_BASE_PORT)
@@ -116,7 +116,7 @@ class ResourceMapper():
                         'ethernet': '2048',
                         'ip': {
                             'protocol': 'udp',
-                            'destination': switch.getForwardingAddress().ip
+                            'destination': switch.getForwardingAddress().ip + '/32'
                         },
                         'udp': {
                             'destination-port': str(rrhId + RRH_BASE_PORT)
@@ -124,7 +124,7 @@ class ResourceMapper():
                     },
                     # instructions
                     [{
-                        'ip-destination': servingHost.ip
+                        'ip-destination': servingHost.ip + '/32'
                     }, {
                         'mac-destination': servingHost.mac
                     }, {
@@ -142,7 +142,7 @@ class ResourceMapper():
                 for host in switch['hosts']:
                     buckets.append({
                         'instructions': [{
-                            'ip-destination': host.ip
+                            'ip-destination': host.ip + '/32'
                         }, {
                             'mac-destination': host.mac
                         }, {
@@ -161,7 +161,7 @@ class ResourceMapper():
                         'ethernet': '2048',
                         'ip': {
                             'protocol': 'udp',
-                            'destination': switch.getForwardingAddress().ip
+                            'destination': switch.getForwardingAddress().ip + '/32'
                         },
                         'udp': {
                             'destination-port': str(rrhId + RRH_BASE_PORT)
