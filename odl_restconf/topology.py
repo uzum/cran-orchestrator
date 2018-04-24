@@ -6,10 +6,10 @@ class Switch():
     def addHost(self, host):
         self.hosts.append(host)
 
-    def getForwardingIp(self):
+    def getForwardingAddress(self):
         if not self.hosts:
             raise IndexError('switch #' + self.id + ' does not have any hosts at the moment')
-        return self.hosts[0].ip
+        return self.hosts[0]
 
 class Host():
     def __init__(self, parameters):

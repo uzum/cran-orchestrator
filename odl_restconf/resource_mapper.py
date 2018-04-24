@@ -1,5 +1,7 @@
 from .api import ODLRestConfAPI
 from .flow import Flow
+from .group import Group
+from .config import *
 from .topology import Topology
 
 class Mapping():
@@ -27,7 +29,7 @@ class ResourceMapper():
         for mapping in self.mappings:
             mappingList.append({
                 'rrh': mapping.rrhId,
-                'bbus': [bbuList]
+                'bbus': mapping.bbuList
             })
         return mappingList
 
@@ -35,21 +37,136 @@ class ResourceMapper():
         mapping = Mapping(rrhId, bbuList)
         targetSwitches = self.topology.getTargetNodes(bbuList)
         if (len(targetSwitches) == 1):
-            flow = self.addForwardingFlow()
+            # add a forwarding flow to the controller switch ovs
+            # that will forward the packet to the single target switch
+            flow = self.addForwardingFlow(
+                self.topology.controllerNodeSwitch,
+                # filters
+                {
+                    'ethernet': '2048',
+                    'ip': {
+                        'protocol': 'udp',
+                        'destination': self.topology.controllerNodeSwitch.getForwardingAddress().ip
+                    },
+                    'udp': {
+                        'destination-port': str(rrhId + RRH_BASE_PORT)
+                    }
+                },
+                # instructions
+                [{
+                    'ip-destination': targetSwitch[0].getForwardingAddress().ip
+                }, {
+                    'mac-destination': targetSwitch[0].getForwardingAddress().mac
+                }],
+                {}
+            )
             mapping.flows.append(flow)
         else:
-            group = self.addReplicationGroup()
-            flow = self.addForwardingFlow()
+            # there are more than one target switches, the packet needs to be replicated
+            # create a replication group in the controller node switch for each target
+            # then add a forwarding flow with group-id action included
+            buckets = []
+            for targetSwitch in targetSwitches:
+                buckets.append({
+                    'instructions': [{
+                        'ip-destination': targetSwitch.getForwardingAddress().ip
+                    }, {
+                        'mac-destination': targetSwitch.getForwardingAddress().mac
+                    }]
+                })
+            group = self.addReplicationGroup(
+                self.topology.controllerNodeSwitch,
+                'all',
+                buckets
+            )
+            flow = self.addForwardingFlow(
+                self.topology.controllerNodeSwitch,
+                # filters
+                {
+                    'ethernet': '2048',
+                    'ip': {
+                        'protocol': 'udp',
+                        'destination': self.topology.controllerNodeSwitch.getForwardingAddress().ip
+                    },
+                    'udp': {
+                        'destination-port': str(rrhId + RRH_BASE_PORT)
+                    }
+                },
+                # instructions
+                [{ 'group-id': str(group.id) }],
+                {}
+            )
             mapping.groups.append(group)
             mapping.flows.append(flow)
 
         for switch in targetSwitches:
+            # there is only one target host (bbu) in this target switch
+            # add a forwarding flow to this target switch ovs that will redirect the packets
+            # and change the udp destination port to the original value
             if (len(switch['hosts']) == 1):
-                flow = self.addForwardingFlow()
+                servingHost = switch['hosts'][0]
+                flow = self.addForwardingFlow(
+                    switch,
+                    # filters
+                    {
+                        'ethernet': '2048',
+                        'ip': {
+                            'protocol': 'udp',
+                            'destination': switch.getForwardingAddress().ip
+                        },
+                        'udp': {
+                            'destination-port': str(rrhId + RRH_BASE_PORT)
+                        }
+                    },
+                    # instructions
+                    [{
+                        'ip-destination': servingHost.ip
+                    }, {
+                        'mac-destination': servingHost.mac
+                    }, {
+                        'udp-dst-port': str(BBU_LISTEN_PORT)
+                    }],
+                    {}
+                )
                 mapping.flows.append(flow)
             else:
-                group = self.addReplicationGroup()
-                flow = self.addForwardingFlow()
+                # there are more than one target hosts (bbus) in this target switch
+                # create a replication group in the switch that will change the dst ip&mac
+                # accordingly for each serving host, and change the udp dst port to default
+                # then create a forwarding flow refering to the new group's id
+                buckets = []
+                for host in switch['hosts']:
+                    buckets.append({
+                        'instructions': [{
+                            'ip-destination': host.ip
+                        }, {
+                            'mac-destination': host.mac
+                        }, {
+                            'udp-dst-port': str(BBU_LISTEN_PORT)
+                        }]
+                    })
+                group = self.addReplicationGroup(
+                    switch,
+                    'all',
+                    buckets
+                )
+                flow = self.addForwardingFlow(
+                    switch,
+                    # filters
+                    {
+                        'ethernet': '2048',
+                        'ip': {
+                            'protocol': 'udp',
+                            'destination': switch.getForwardingAddress().ip
+                        },
+                        'udp': {
+                            'destination-port': str(rrhId + RRH_BASE_PORT)
+                        }
+                    },
+                    #instructions
+                    [{ 'group-id': str(group.id) }],
+                    {}
+                )
                 mapping.groups.append(group)
                 mapping.flows.append(flow)
         self.mappings.append(mapping)
@@ -63,6 +180,33 @@ class ResourceMapper():
                 for group in mapping.groups:
                     self.removeGroup(group)
                 self.addMapping(mapping.rrhId, mapping.bbuList)
+
+    def addForwardingFlow(self, switch, filters, instructions, options):
+        print('Creating a forwarding flow in ' + switch.id)
+        print('\tIntended for ' + filters['ip']['destination'] + ', forwarding to ' + instructions[0]['ip-destination'])
+        instructions.append({ 'output': 'NORMAL' })
+        flow = Flow({
+            'switch': switch.id,
+            'priority': options.get('priority', '65535'),
+            'hard-timeout': options.get('hard-timeout', '0'),
+            'idle-timeout': options.get('idle-timeout', '0'),
+            'table_id': options.get('table_id', '0'),
+            'filters': filters,
+            'instructions': instructions
+        })
+        self.api.addFlow(flow)
+        return flow
+
+    def addReplicationGroup(self, switch, selectType, buckets):
+        print('Creating a new group in ' + switch.id)
+        buckets.append({ 'output': 'NORMAL' })
+        group = Group({
+            'switch': switch.id,
+            'type': selectType,
+            'buckets': buckets
+        })
+        self.api.addGroup(group)
+        return group
 
     def addUDPForwardingFlow(self, switch, decoy, target, options={}):
         if ('filter' not in options):
