@@ -1,7 +1,6 @@
-from api import ODLRestConfAPI
-from flow import Flow
-from topology import Topology
-from mapping import Mapping
+from .api import ODLRestConfAPI
+from .flow import Flow
+from .topology import Topology
 
 class Mapping():
     def __init__(self, rrhId, bbuList):
@@ -15,13 +14,22 @@ class ResourceMapper():
         self.api = ODLRestConfAPI()
 
         self.topology = Topology()
-        self.topology.discover(self.api.topology())
-        self.topology.print()
+        # self.topology.discover(self.api.topology())
+        # self.topology.display()
 
         self.mappings = []
 
     def setControllerNodeSwitch(self, switchId):
         self.topology.setControllerNodeSwitch(switchId)
+
+    def getCurrentMapping(self):
+        mappingList = []
+        for mapping in self.mappings:
+            mappingList.append({
+                'rrh': mapping.rrhId,
+                'bbus': [bbuList]
+            })
+        return mappingList
 
     def addMapping(self, rrhId, bbuList):
         mapping = Mapping(rrhId, bbuList)

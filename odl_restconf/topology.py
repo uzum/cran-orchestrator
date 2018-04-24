@@ -22,7 +22,7 @@ class Topology():
         self.controllerNodeSwitch = None
         self.computeNodeSwitches = []
 
-    def print(self):
+    def display(self):
         if (self.controllerNodeSwitch):
             print('Controller Node: ')
             print('\t' + switch.id)
