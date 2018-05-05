@@ -1,17 +1,35 @@
 from threading import Timer
 from functools import partial
 from udp_socket import UDPSocket
+import math
+import random
+import json
 from config import *
+
+def createPayload(socket):
+    return json.dumps({
+      'rrh': socket.rrh,
+      'connection': socket.connection,
+      'sequenceNumber': socket.sequenceNumber
+    })
+
+def nextTime(rate):
+    return -math.log(1.0 - random.random()) / rate
 
 if __name__ == "__main__":
     def sendMessage(socket):
-        socket.send('hello from ' + socket.name + '\n')
-        Timer(SEND_INTERVAL, partial(sendMessage, socket)).start()
+        socket.send(createPayload(socket))
+        interval = nextTime(POISSON_RATE)
+        print("next packet from " + socket.name + " will be sent in " + str(interval) + " seconds")
+        Timer(interval, partial(sendMessage, socket)).start()
 
     for idx in range(RRH_NUMBER):
-        udp_socket = UDPSocket({
-            'name': 'RRH#' + str(idx + 1),
-            'port': BASE_PORT + idx,
-            'ip': TARGET_IP
-        })
-        sendMessage(udp_socket)
+        for connIdx in range(CONNECTION_NUMBER):
+            udp_socket = UDPSocket({
+                'rrh': idx,
+                'connection': connIdx,
+                'name': 'RRH#' + str(idx) + 'CONN#' + str(connIdx),
+                'port': BASE_PORT,
+                'ip': TARGET_IP
+            })
+            sendMessage(udp_socket)
