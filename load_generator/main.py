@@ -29,7 +29,7 @@ if __name__ == "__main__":
                 'rrh': idx,
                 'connection': connIdx,
                 'name': 'RRH#' + str(idx) + 'CONN#' + str(connIdx),
-                'port': BASE_PORT,
+                'port': BASE_PORT + idx + 1,
                 'ip': TARGET_IP
             })
             sendMessage(udp_socket)
