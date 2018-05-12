@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
 from .resource_mapper import ResourceMapper
 
-app = Flask('odl_restconf')
+app = Flask('resource_mapper')
 rm = ResourceMapper()
 
 @app.route("/mapping/all", methods=['GET'])
@@ -24,6 +24,6 @@ def setControllerNodeSwitch():
     rm.setControllerNodeSwitch(request.args.get('id'))
     return "OK"
 
-class Server():
+class RMServer():
     def run(self):
         app.run()

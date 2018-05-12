@@ -1,9 +1,14 @@
 from flask import Flask, jsonify, request
 from .load_generator import LoadGenerator
+from .config import *
 
-app = Flask('odl_restconf')
+app = Flask('load_generator')
 lg = LoadGenerator()
 
-class Server():
+@app.route("/configuration", methods=['GET'])
+def getConfiguration():
+    return jsonify(lg.getConfiguration())
+
+class LGServer():
     def run(self):
-        app.run()
+        app.run(port=SERVICE_PORT)

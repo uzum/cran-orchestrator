@@ -3,7 +3,7 @@ import time
 from load_generator import LGServer
 
 if __name__ == "__main__":
-    lgServer = lgServer()
+    lgServer = LGServer()
     # rmServer = RMServer()
     lgServer.run()
     # rmServer.run()

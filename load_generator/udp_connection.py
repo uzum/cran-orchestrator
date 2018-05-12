@@ -39,3 +39,9 @@ class UDPConnection():
 
     def start(self):
         self.sendPacket()
+
+    def toObject(self):
+        return {
+            'name': self.name,
+            'sequenceNumber': self.sequenceNumber
+        }
