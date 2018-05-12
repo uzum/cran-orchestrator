@@ -35,7 +35,7 @@ class UDPConnection():
         return json.dumps({
             'name': self.name,
             'seq': self.sequenceNumber    
-        })
+        }) + "\n"
 
     def start(self):
         self.sendPacket()

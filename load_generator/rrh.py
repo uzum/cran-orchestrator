@@ -18,7 +18,7 @@ class RRH():
                 'dstPort': self.dstPort
             })
             connection.start()
-            self.connections.add(connection)
+            self.connections.append(connection)
     def removeConnection(self, amount=1):
         connection = self.connections.pop()
         connection.close()
