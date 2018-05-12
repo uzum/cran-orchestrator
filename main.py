@@ -1,6 +1,9 @@
 import time
-from odl_restconf import Server
+# from resource_mapper import RMServer
+from load_generator import LGServer
 
 if __name__ == "__main__":
-    rmServer = Server()
-    rmServer.run()
+    lgServer = lgServer()
+    # rmServer = RMServer()
+    lgServer.run()
+    # rmServer.run()
