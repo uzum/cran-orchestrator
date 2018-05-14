@@ -14,6 +14,7 @@ class RRH():
         self.dstPort = options['dstPort']
         self.dstIP = options['dstIP']
         self.connections = []
+        self.arrivalRate = options['arrivalRate']
         self.addConnection(options['connectionNumber'])
 
     def addConnection(self, amount=1):
@@ -21,7 +22,8 @@ class RRH():
             connection = UDPConnection({
                 'name': 'rrh#' + str(self.id) + 'connection#' + str(RRH.getNextId()),
                 'dstIP': self.dstIP,
-                'dstPort': self.dstPort
+                'dstPort': self.dstPort,
+                'arrivalRate': self.arrivalRate
             })
             connection.start()
             self.connections.append(connection)
@@ -31,6 +33,11 @@ class RRH():
             connection = self.connections.pop()
             connection.close()
 
+    def setArrivalRate(self, rate):
+        self.arrivalRate = rate
+        for connection in self.connections:
+            connection.setArrivalRate(rate)
+
     def destroy(self):
         for connection in self.connections:
             connection.close()
@@ -39,5 +46,6 @@ class RRH():
        return {
            'id': self.id,
            'dstPort': self.dstPort,
+           'arrivalRate': self.arrivalRate,
            'connections': [connection.toObject() for connection in self.connections]
        }
