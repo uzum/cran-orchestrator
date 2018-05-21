@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
 from .resource_mapper import ResourceMapper
+from .config import *
 
 app = Flask('resource_mapper')
 rm = ResourceMapper()
@@ -26,4 +27,4 @@ def setControllerNodeSwitch():
 
 class RMServer():
     def run(self):
-        app.run()
+        app.run(port=SERVICE_PORT)

@@ -14,22 +14,33 @@
       <div class="row">
         <div class="col-md">
           <h2>load-generator</h2>
-          <div id="lg-vue-app"></div>
+          <div id="lg-vue-app">
+            <div id="rrh-container" class="row">
+              <remote-radio-head
+                v-for="rrh in rrhs"
+                v-bind:key="rrh.id"
+                v-bind:rrh="rrh"
+                v-on:change="update"
+              />
+            </div>
+            <div class="row">
+              <new-remote-radio-head
+                v-bind:rrh="newRrh"
+                v-on:change="update"
+              />
+            </div>
+          </div>
         </div>
         <div class="col-md">
           <h2>resource-mapper</h2>
           <div id="rm-vue-app">
-            <RemoteRadioHead
-              v-for="rrh in rrhs"
-              v-bind:key="rrh.id"
-              v-on:change="update"
-            />
           </div>
         </div>
       </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script src="./javascript/main.js"></script>
+    <script src="./javascript/load-generator.js"></script>
+    <script src="./javascript/resource-mapper.js"></script>
   </body>
 </html>
