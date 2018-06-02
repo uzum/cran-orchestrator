@@ -1,5 +1,24 @@
-const RMServerURL = 'http://127.0.0.1:5002';
+const RMServerURL = '/resource-mapper';
 
 const RM = new Vue({
-  el: '#rm-vue-app'
+  el: '#rm-vue-app',
+  data: function(){
+    return {
+      mappings: [],
+      newMapping: {
+        rrh: 0,
+        bbus: []
+      },
+      topology: {
+        controllerNode: '',
+        computeNodes: []
+      }
+    };
+  },
+  created: function(){
+    this.update();
+  },
+  methods: {
+   update: function(){}
+  }
 });
