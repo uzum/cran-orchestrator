@@ -1,4 +1,4 @@
-const LGServerURL = 'http://127.0.0.1:5001';
+const LGServerURL = '/load-generator';
 
 Vue.component('new-remote-radio-head', {
   template: `
