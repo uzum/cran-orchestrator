@@ -11,16 +11,36 @@ class Switch():
             raise IndexError('switch #' + self.id + ' does not have any hosts at the moment')
         return self.hosts[0]
 
+    def toObject(self):
+        return {
+            'id': self.id,
+            'hosts': [host.toObject() for host in self.hosts]
+        }
+
 class Host():
     def __init__(self, parameters):
         self.id = parameters['id']
         self.mac = parameters['mac']
         self.ip = parameters['ip']
 
+    def toObject(self):
+        return {
+            'id': self.id,
+            'mac': self.mac,
+            'ip': self.ip
+        }
+
 class Topology():
     def __init__(self):
         self.controllerNodeSwitch = None
         self.computeNodeSwitches = []
+
+    def objectify(self):
+        topoObject = {}
+        if (self.controllerNodeSwitch):
+            topoObject['controllerNode'] = self.controllerNodeSwitch.toObject()
+        topoObject['computeNodes'] = [switch.toObject() for switch in self.computeNodeSwitches]
+        return topoObject
 
     def display(self):
         if (self.controllerNodeSwitch):

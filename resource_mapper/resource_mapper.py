@@ -32,6 +32,9 @@ class ResourceMapper():
 
         self.mappings = []
 
+    def getTopology(self):
+        return self.topology
+
     def setControllerNodeSwitch(self, switchId):
         self.topology.setControllerNodeSwitch(switchId)
         self.topology.discover(self.api.topology())

@@ -130,7 +130,6 @@ const LG = new Vue({
         .then((response) => {
           while (this.rrhs.length) this.rrhs.pop();
           response.data.forEach(rrh => this.rrhs.push(rrh));
-          console.log(this.rrhs);
         })
         .catch(function(error){
           console.log(error);

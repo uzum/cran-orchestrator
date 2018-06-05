@@ -23,7 +23,11 @@ class ODLRestConfAPI():
         return response
 
     def topology(self):
-        return self.requestGet('/restconf/operational/network-topology:network-topology').json()['network-topology']['topology'][0]
+        response = self.requestGet('/restconf/operational/network-topology:network-topology').json()['network-topology']['topology']
+        for topo in response:
+            if (topo['topology-id'] == 'flow:1'):
+                return topo
+        return None
 
     def addFlow(self, flow):
         return self.requestPost('/restconf/operations/sal-flow:add-flow', flow.xml())
