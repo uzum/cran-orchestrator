@@ -1,17 +1,34 @@
 const RMServerURL = '/resource-mapper';
 
+Vue.component('openstack-host', {
+  props: ['host'],
+  template: `
+    <div style="padding: 5px; margin-bottom: 10px; background-color: rgba(0,0,0,.03)">
+      <p>
+        <span style="width: 100%; font-size: 16px;" class="badge badge-info">Host#{{ host.id }}</span>
+      </p>
+      <p>
+        <b>IP: </b><span>{{ host.ip }}</span>
+      </p>
+      <p>
+        <b>MAC: </b><span>{{ host.mac }}</span>
+      </p>
+    </div>
+  `
+});
+
 Vue.component('openstack-node', {
   props: ['node', 'type', 'candidate'],
   template: `
     <div class="col-md-6">
-      <div class="card">
+      <div class="card" style="margin-bottom: 20px">
         <div class="card-header">
-          <b>Node#{{ node.id }} - {{ type }}</b>
+          <b>{{ node.id }}</b><br />
+          <span
+            class="badge" v-bind:class="badgeClass">{{ type }}</span>
         </div>
         <div class="card-body">
-          <div v-for="host in node.hosts">
-            <span><b>Host#{{ host.id }}: {{ host.ip }}/{{ host.mac }}</b></span>
-          </div>
+          <openstack-host v-for="host in node.hosts" v-bind:host="host" />
         </div>
         <button v-if="candidate" class="btn btn-primary" type="button" v-on:click="setControllerNode">
           Set controller
@@ -19,6 +36,14 @@ Vue.component('openstack-node', {
       </div>
     </div>
   `,
+  computed: {
+    badgeClass: function(){
+      return {
+        'badge-danger': this.type === 'controller',
+        'badge-dark': this.type === 'compute'
+      };
+    }
+  },
   methods: {
     setControllerNode: function(){
       axios.post(`${RMServerURL}/topology/set-controller?id=${this.node.id}`)
@@ -35,8 +60,25 @@ Vue.component('openstack-node', {
 Vue.component('mapping', {
   props: ['rule'],
   template: `
-    <div>mapping</div>
+    <div class="col-md-12">
+      mapping#{{ rule.id }}
+    </div>
   `
+});
+
+Vue.component('mapping-list', {
+  props: ['mappings', 'newMapping'],
+  template: `
+    <div class="row">
+      <h3>Current mapping: </h3>
+      <mapping v-for="mapping in mappings" v-bind:key="mapping.id" v-bind:rule="mapping" />
+    </div>
+  `,
+  methods: {
+    onMappingChange: function(){
+      this.$emit('change');
+    }
+  }
 });
 
 Vue.component('topology', {

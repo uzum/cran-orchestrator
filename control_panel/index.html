@@ -34,13 +34,18 @@
         <div class="col-md">
           <h2>resource-mapper</h2>
           <div id="rm-vue-app">
-            <topology
-              v-bind:topology="topology"
-              v-on:change="updateTopology"
-            />
-            <div class="row">
-              <h3>Current mapping</h3>
-              <mapping v-for="mapping in mappings" v-bind:rule="mapping" />
+            <div>
+              <topology
+                v-bind:topology="topology"
+                v-on:change="updateTopology"
+              />
+            </div>
+            <div>
+              <mapping-list
+                v-bind:mappings="mappings"
+                v-bind:newMapping="newMapping"
+                v-on:change="updateMapping"
+              />
             </div>
           </div>
         </div>
