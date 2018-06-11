@@ -8,14 +8,13 @@ Vue.component('new-remote-radio-head', {
           <b>Create new RRH</b>
         </div>
         <div class="card-body">
-            <b>Poisson rate: </b>
-            <div class="input-group">
-              <input class="form-control" type="text" v-model="rrh.arrivalRate" />
-              <div class="input-group-append">
-                <button class="btn btn-primary" type="button" v-on:click="create">Create</button>
-              </div>
+          <b>Poisson rate: </b>
+          <div class="input-group">
+            <input class="form-control" type="text" v-model="rrh.arrivalRate" />
+            <div class="input-group-append">
+              <button class="btn btn-primary" type="button" v-on:click="create">Create</button>
             </div>
-          </p>
+          </div>
         </div>
       </div>
     </div>
