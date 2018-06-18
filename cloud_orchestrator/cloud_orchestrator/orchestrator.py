@@ -108,4 +108,12 @@ class Orchestrator(object):
             return instance.live_migrate(host=host)
         except Exception as e:
             print e
-        return None
+        return instance.live_migrate(host=host)
+
+    def get_instance_diagnostics(self, instance):
+        if isinstance(instance, str):
+            instance = self.find_instance(name=instance)
+            if instance:
+                return instance.diagnostics()
+            return None
+        return instance.diagnostics()

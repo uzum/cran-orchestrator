@@ -60,7 +60,6 @@ class Credentials(object):
                 'project_domain_name': self.project_domain_name,
                 'user_domain_name': self.user_domain_name
             })
-            print dct
             auth = v3.Password(**dct)
         else:
             dct.update({

@@ -32,7 +32,7 @@ def test_sec_group():
 
 
 @pytest.mark.orchestrator
-def test_create_and_remove_instance():
+def test_create_instance():
     # Find Cirros Image
     image = orchestrator.find_image(image_name="cirros-0.3.5-x86_64-disk")
     # Find m1.tiny flavor
@@ -47,10 +47,19 @@ def test_create_and_remove_instance():
                                             key_name=None,
                                             nic=network)
     assert instance == "vm1"
-    # Test the deletion with name
-    assert orchestrator.delete_instance(instance="vm1") is not None
 
 
 @pytest.mark.orchestrator
 def test_live_migrate():
     assert orchestrator.live_migrate_instance(instance="vm1", host="5G-2") is ()
+
+
+@pytest.mark.orchestrator
+def test_get_instance_diagnostics():
+    assert orchestrator.get_instance_diagnostics(instance="vm1") is not None
+
+
+@pytest.mark.orchestrator
+def test_delete_instance():
+    # Test the deletion with name
+    assert orchestrator.delete_instance(instance="vm1") is not None
