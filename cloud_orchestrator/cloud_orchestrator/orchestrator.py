@@ -1,16 +1,13 @@
 #!/usr/bin/env python
 
-import glanceclient.v2.client as GlanceClient
+import glanceclient.v2 as GlanceClient
 import neutronclient.neutron.client as NeutronClient
 import novaclient.client as NovaClient
 
 from credentials import Credentials
 
 
-# This file contains some simple examples of openstack python api.
-# Before running, make sure openrc file is sourced.
-
-# Use wide exceptions for now
+# pylint: disable=broad-except
 
 class Orchestrator(object):
     def __init__(self):
@@ -18,26 +15,47 @@ class Orchestrator(object):
         self.session = self.credentials.get_session()
         self.nova_client = NovaClient.Client(2, session=self.session)
         self.neutron_client = NeutronClient.Client('2.0', session=self.session)
-        self.glance_client = GlanceClient.Client('2', session=self.session)
+        self.glance_client = GlanceClient.Client('3', session=self.session)
 
     # Find image (For now assume image is uploaded using CLI/Horizon
     def find_image(self, image_name):
         try:
             return next(self.glance_client.images.list(filters={'name': image_name}), None)
         except Exception as e:
-            print(e)
+            print e
         return None
 
     # Find network with label
     def find_network(self, label):
-        return self.neutron_client.list_networks(label=label)
+        try:
+            networks = self.neutron_client.list_networks(label=label)
+            if 'networks' in networks and networks['networks']:
+                return networks['networks'][0]
+            else:
+                raise Exception
+        except Exception as e:
+            print e
+        return None
 
     # Find flavor
     def find_flavor(self, flavor_name):
         try:
             return self.nova_client.flavors.find(name=flavor_name)
         except Exception as e:
-            print(e)
+            print e
+
+    # Find security grouo
+    def find_sec_group(self, name, project_id=None):
+        security_groups = self.neutron_client.list_security_groups()
+        if 'security_groups' in security_groups:
+            for security_group in security_groups['security_groups']:
+                if security_group['name'] == name:
+                    if project_id:
+                        if security_group['project_id'] == project_id:
+                            return security_group
+                    else:
+                        return security_group
+        return None
 
     def create_instance(self, vm_name, image, flavor, key_name,
                         nic, sec_group, avail_zone=None, user_data=None,
@@ -47,6 +65,11 @@ class Orchestrator(object):
             security_groups = [sec_group['id']]
         else:
             security_groups = None
+
+        # Allow both single nic or multiple nics
+        if not isinstance(nic, list):
+            nic["net-id"] = nic["id"]
+            nic = [nic]
 
         # Also attach the created security group for the test
         instance = self.nova_client.servers.create(name=vm_name,
@@ -61,14 +84,28 @@ class Orchestrator(object):
                                                    security_groups=security_groups)
         return instance
 
+    def find_instance(self, name):
+        for server in self.nova_client.servers.list():
+            if server.name == name:
+                return server
+        return None
 
-def main():
-    orchestrator = Orchestrator()
-    image = orchestrator.find_image(image_name="cirros")
-    flavor = orchestrator.find_flavor(flavor_name="m1.tiny")
-    network = orchestrator.find_network(label="private")
-    instance = orchestrator.create_instance(vm_name="vm1", image=image, flavor=flavor, key_name=None, nic=network)
+    def delete_instance(self, instance):
+        # if instance name is given
+        if isinstance(instance, str):
+            instance = self.find_instance(name=instance)
+            if instance:
+                instance.delete()
+        else:
+            return instance.delete()
+        return None
 
-
-if __name__ == "__main__":
-    main()
+    def live_migrate_instance(self, instance, host=None):
+        try:
+            # if instance name is given
+            if isinstance(instance, str):
+                instance = self.find_instance(name=instance)
+            return instance.live_migrate(host=host)
+        except Exception as e:
+            print e
+        return None
