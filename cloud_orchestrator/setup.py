@@ -21,7 +21,7 @@ class Tox(test):
 if __name__ == '__main__':
     setup(setup_requires=['pbr'], pbr=True,
           install_requires=['pytest'],
-          keywords='intellipong',
+          keywords='cloud_orchestrator',
           tests_require=['tox'],
           cmdclass={'test': Tox}
           )

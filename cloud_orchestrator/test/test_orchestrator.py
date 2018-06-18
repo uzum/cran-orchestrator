@@ -11,12 +11,12 @@ orchestrator = Orchestrator()
 @pytest.mark.orchestrator
 def test_find_image():
     assert orchestrator.find_image(
-        image_name="cirros-0.3.5-x86_64-disk") == "cirros-0.3.5-x86_64-disk"
+        image_name="cirros-0.3.5-x86_64-disk").name == "cirros-0.3.5-x86_64-disk"
 
 
 @pytest.mark.orchestrator
 def test_find_flavor():
-    assert orchestrator.find_flavor(flavor_name="m1.tiny") == "m1.tiny"
+    assert orchestrator.find_flavor(flavor_name="m1.tiny").get_keys() == {}
 
 
 @pytest.mark.orchestrator
@@ -46,7 +46,7 @@ def test_create_instance():
                                             sec_group=sec_group,
                                             key_name=None,
                                             nic=network)
-    assert instance == "vm1"
+    assert instance.name == "vm1"
 
 
 @pytest.mark.orchestrator
