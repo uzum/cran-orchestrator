@@ -1,4 +1,5 @@
 from flask import Flask, Blueprint, jsonify, request
+from flask_cors import CORS
 from .resource_mapper import ResourceMapper
 from .config import *
 
@@ -10,6 +11,7 @@ class RMServer():
     def __init__(self):
         RMServer.ref = ResourceMapper()
         app = Flask('resource-mapper')
+        CORS(app)
         app.register_blueprint(resource_mapper, url_prefix='/resource-mapper')
         app.run(host='0.0.0.0', port=SERVICE_PORT)
 

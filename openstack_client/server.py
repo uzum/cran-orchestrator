@@ -1,4 +1,5 @@
 from flask import Flask, Blueprint, jsonify, request
+from flask_cors import CORS
 from .config import *
 from .cloud_orchestrator.orchestrator import Orchestrator
 
@@ -10,5 +11,6 @@ class OCServer():
     def __init__(self):
         OCServer.ref = Orchestrator()
         app = flask('openstack-client')
+        CORS(app)
         app.register_blueprint(openstack_client, url_prefix='/openstack-client')
         app.run(host='0.0.0.0', port=SERVICE_PORT)

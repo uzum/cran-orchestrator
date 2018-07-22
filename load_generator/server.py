@@ -1,4 +1,5 @@
 from flask import Flask, Blueprint, jsonify, request
+from flask_cors import CORS
 from .load_generator import LoadGenerator
 from .config import *
 
@@ -10,6 +11,7 @@ class LGServer():
     def __init__(self):
         LGServer.ref = LoadGenerator()
         app = Flask('load-generator')
+        CORS(app)
         app.register_blueprint(load_generator, url_prefix='/load-generator')
         app.run(host='0.0.0.0', port=SERVICE_PORT)
 
