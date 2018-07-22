@@ -22,7 +22,7 @@ class Orchestrator(object):
         try:
             return next(self.glance_client.images.list(filters={'name': image_name}), None)
         except Exception as e:
-            print e
+            print(e)
         return None
 
     # Find network with label
@@ -34,7 +34,7 @@ class Orchestrator(object):
             else:
                 raise Exception
         except Exception as e:
-            print e
+            print(e)
         return None
 
     # Find flavor
@@ -42,7 +42,7 @@ class Orchestrator(object):
         try:
             return self.nova_client.flavors.find(name=flavor_name)
         except Exception as e:
-            print e
+            print(e)
 
     # Find security grouo
     def find_sec_group(self, name, project_id=None):
@@ -107,7 +107,7 @@ class Orchestrator(object):
                 instance = self.find_instance(name=instance)
             return instance.live_migrate(host=host)
         except Exception as e:
-            print e
+            print(e)
         return instance.live_migrate(host=host)
 
     def get_instance_diagnostics(self, instance):
