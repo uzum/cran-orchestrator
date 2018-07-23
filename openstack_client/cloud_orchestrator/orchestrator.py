@@ -5,6 +5,7 @@ import neutronclient.neutron.client as NeutronClient
 import novaclient.client as NovaClient
 
 from credentials import Credentials
+from ..config import *
 
 
 # pylint: disable=broad-except
@@ -16,6 +17,11 @@ class Orchestrator(object):
         self.nova_client = NovaClient.Client(2, session=self.session)
         self.neutron_client = NeutronClient.Client('2.0', session=self.session)
         self.glance_client = GlanceClient.Client('3', session=self.session)
+
+        self.DEFAULT_IMAGE = self.find_image(image_name=DEFAULT_IMAGE_NAME)
+        self.DEFAULT_FLAVOR = self.find_flavor(flavor_name=DEFAULT_FLAVOR_NAME)
+        self.DEFAULT_SEC_GROUP = self.find_sec_group(name=DEFAULT_SEC_GROUP_NAME)
+        self.DEFAULT_NETWORK = self.find_network(label=DEFAULT_NETWORK_LABEL)
 
     # Find image (For now assume image is uploaded using CLI/Horizon
     def find_image(self, image_name):
@@ -89,6 +95,12 @@ class Orchestrator(object):
             if server.name == name:
                 return server
         return None
+
+    def list_hypervisors(self):
+        return self.nova_client.hypervisors.list()
+
+    def list_instances(self, func=lambda _: return True):
+        return list(filter(func, self.nova_client.servers.list()))
 
     def delete_instance(self, instance):
         # if instance name is given
