@@ -5,6 +5,16 @@ from .cloud_orchestrator.orchestrator import Orchestrator
 
 openstack_client = Blueprint('openstack_client', __name__)
 
+# returns a simplified representation of an hypervisor
+def getHypervisorDetails(hypervisor):
+    return {
+        'id': hypervisor.id,
+        'host_ip': hypervisor.host_ip,
+        'hostname': hypervisor.hypervisor_hostname,
+        'running_vms': hypervisor.running_vms,
+        'state': hypervisor.state
+    }
+
 # returns a simplified representation of a network address
 def getAddressDetails(address):
     return {
@@ -32,9 +42,9 @@ class OCServer():
         app.run(host='0.0.0.0', port=SERVICE_PORT)
 
     # returns the list of hypervisors registered to openstack
-    @openstack_client.route("/hypervisors", methods=['GET'])
+    @openstack_client.route("/hypervisor/all", methods=['GET'])
     def getHypervisors():
-        return jsonify(OCServer.ref.list_hypervisors())
+        return jsonify(list(map(getHypervisorDetails, OCServer.ref.list_hypervisors())))
 
     # returns the list of instances located in the given hostname (hypervisor|node)
     @openstack_client.route("/hypervisor/<hostname>/instances", methods=['GET'])

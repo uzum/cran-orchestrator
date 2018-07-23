@@ -1,4 +1,4 @@
-from .api import ODLRestConfAPI
+from .api import ODLRestConfAPI, OSClientAPI
 from .flow import Flow
 from .group import Group
 from .config import *
@@ -24,20 +24,39 @@ class Mapping():
 
 class ResourceMapper():
     def __init__(self):
-        self.api = ODLRestConfAPI()
+        self.ODLAPI = ODLRestConfAPI()
+        self.OSAPI = OSClientAPI()
 
         self.topology = Topology()
-        self.topology.discover(self.api.topology())
-        self.topology.display()
+        self.topology.discover(self.ODLAPI.topology())
+        self.discoverControllerNode()
 
         self.mappings = []
 
     def getTopology(self):
         return self.topology
 
+    def discoverControllerNode(self):
+        # retrieve all the hypervisors in the openstack
+        hypervisors = self.OSAPI.hypervisors()
+        for hv in hypervisors:
+            # find the hypervisor with id=1 (controller node)
+            if (hv['id'] == 1):
+                # retrieve the instances located in controller node
+                vms = self.OSAPI.instances(hv)
+                # iterate over switch hosts and try to find overlapping ip addresses
+                for switch in self.topology.computeNodeSwitches:
+                    for host in switch.hosts:
+                        for vm in vms:
+                            for address in vm['addresses']:
+                                if address['type'] == 'fixed' and address['addr'] == host.ip:
+                                    self.setControllerNodeSwitch(switch.id)
+                                    return
+        print('Unable to discover controller node!')
+
     def setControllerNodeSwitch(self, switchId):
         self.topology.setControllerNodeSwitch(switchId)
-        self.topology.discover(self.api.topology())
+        self.topology.discover(self.ODLAPI.topology())
         self.topology.display()
 
     def getCurrentMapping(self):
@@ -202,7 +221,7 @@ class ResourceMapper():
         self.mappings = [mapping for mapping in self.mappings if mapping.id != id]
 
     def onBBUMigration(self, bbuId):
-        self.topology.discover(self.api.topology())
+        self.topology.discover(self.ODLAPI.topology())
         for mapping in self.mappings:
             if bbuId in mapping.bbuList:
                 for flow in mapping.flows:
@@ -224,7 +243,7 @@ class ResourceMapper():
             'filters': filters,
             'instructions': instructions
         })
-        self.api.addFlow(flow)
+        self.ODLAPI.addFlow(flow)
         return flow
 
     def addReplicationGroup(self, switch, selectType, buckets):
@@ -234,11 +253,11 @@ class ResourceMapper():
             'type': selectType,
             'buckets': buckets
         })
-        self.api.addGroup(group)
+        self.ODLAPI.addGroup(group)
         return group
 
     def removeFlow(self, flow):
-        self.api.removeFlow(flow)
+        self.ODLAPI.removeFlow(flow)
 
     def removeGroup(self, group):
-        self.api.removeGroup(group)
+        self.ODLAPI.removeGroup(group)
