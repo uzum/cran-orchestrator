@@ -99,7 +99,7 @@ class Orchestrator(object):
     def list_hypervisors(self):
         return self.nova_client.hypervisors.list()
 
-    def list_instances(self, func=lambda _: return True):
+    def list_instances(self, func=lambda _: True):
         return list(filter(func, self.nova_client.servers.list()))
 
     def delete_instance(self, instance):

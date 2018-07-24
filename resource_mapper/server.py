@@ -13,7 +13,7 @@ class RMServer():
         app = Flask('resource-mapper')
         CORS(app)
         app.register_blueprint(resource_mapper, url_prefix='/resource-mapper')
-        app.run(host='0.0.0.0', port=SERVICE_PORT)
+        app.run(host='0.0.0.0', port=RM_SERVICE_PORT)
 
     @resource_mapper.route("/mapping/all", methods=['GET'])
     def getMapping():
