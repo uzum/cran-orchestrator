@@ -62,6 +62,12 @@ class Orchestrator(object):
                         return security_group
         return None
 
+    def create_default_instance(self, name):
+        instance = self.nova_client.servers.create(name=name,
+                                                   image=self.DEFAULT_IMAGE,
+                                                   flavor=self.DEFAULT_FLAVOR)
+        return instance
+
     def create_instance(self, vm_name, image, flavor, key_name,
                         nic, sec_group, avail_zone=None, user_data=None,
                         config_drive=None, files=None):

@@ -24,6 +24,9 @@ def getAddressDetails(address):
 
 # returns a simplifed representation of an instance
 def getInstanceDetails(instance):
+    if DEFAULT_NETWORK_LABEL not in instance.addresses:
+        instance.addresses[DEFAULT_NETWORK_LABEL] = []
+
     return {
         'name': instance.name,
         'status': instance.status,
@@ -56,15 +59,7 @@ class OCServer():
     # creates a new instance with the given parameters
     @openstack_client.route("/instance", methods=['POST'])
     def createInstance():
-        # TODO: other parameters could be provided in the request, do not always assume default
-        return jsonify(getInstanceDetails(OCServer.ref.create_instance(
-            vm_name=request.args.get("name"), # read the vm name from the query parameters
-            image=OCServer.ref.DEFAULT_IMAGE,
-            flavor=OCServer.ref.DEFAULT_FLAVOR,
-            sec_group=OCServer.ref.DEFAULT_SEC_GROUP,
-            nic=OCServer.ref.DEFAULT_NETWORK,
-            key_name=None
-        )))
+        return jsonify(getInstanceDetails(OCServer.ref.create_default_instance(name=request.args.get("name"))))
 
     # live-migrates the given instance to the target hypervisor with the given hostname
     @openstack_client.route("/instance/<name>/migrate", methods=['POST'])
