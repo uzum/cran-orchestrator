@@ -3,20 +3,22 @@ const OCServerURL = '/openstack-client';
 Vue.component('instance', {
   props: ['instance'],
   template: `
-    <hr>
-    <b>{{ instance.name }}</b><br />
-    <b>ID:</b> {{ instance.id }}<br />
-    <b>Status:</b> {{ instance.status }}<br />
-    <b>Addresses:</b><br />
-    <p v-for="address in instance.addresses">
-      <b>{{ address.type }}:</b> {{ address.addr }}<br />
-    </p>
-    <button class="btn btn-danger" v-on:click="delete">Delete</button>
-    <hr>
+    <div>
+      <hr>
+      <b>{{ instance.name }}</b><br />
+      <b>ID:</b> {{ instance.id }}<br />
+      <b>Status:</b> {{ instance.status }}<br />
+      <b>Addresses:</b><br />
+      <p v-for="address in instance.addresses" v-bind:address="address">
+        <b>{{ address.type }}:</b> {{ address.addr }}<br />
+      </p>
+      <button class="btn btn-danger" v-on:click="deleteInstance">Delete</button>
+      <hr>
+    </div>
     `,
   methods: {
-    delete: function(){
-      this.$emit('delete', this.name);
+    deleteInstance: function(){
+      this.$emit('delete', this.instance.name);
     },
     migrate: function(){}
   }
@@ -44,7 +46,7 @@ Vue.component('hypervisor', {
             ></li>
             <li>
               <div class="input-group">
-                <input v-model="newInstance.name" type="text" class="form-control" placeholder="Instance name">
+                <input v-model="hypervisor.newInstance.name" type="text" class="form-control" placeholder="Instance name">
                 <div class="input-group-append">
                   <button class="btn btn-outline-secondary" type="button" v-on:click="createInstance">Create new</button>
                 </div>
@@ -57,7 +59,7 @@ Vue.component('hypervisor', {
   `,
   methods: {
     createInstance: function(){
-      axios.post(`${OCServerURL}/instance/create?name=${this.newInstance.name}`)
+      axios.post(`${OCServerURL}/instance?name=${this.hypervisor.newInstance.name}`)
         .then((response) => {
           this.$emit('change');
         })
@@ -84,10 +86,7 @@ const OC = new Vue({
   el: '#oc-vue-app',
   data: function(){
     return {
-      hypervisors: [],
-      newInstance: {
-        name: ''
-      }
+      hypervisors: []
     };
   },
   created: function(){
@@ -101,7 +100,8 @@ const OC = new Vue({
           return axios.get(`${OCServerURL}/hypervisor/${hypervisor.hostname}/instances`)
             .then((hvResponse) => {
               this.hypervisors.push(Object.assign({
-                instances: hvResponse.data
+                instances: hvResponse.data,
+                newInstance: { name: '' }
               }, hypervisor));
             });
         }));
