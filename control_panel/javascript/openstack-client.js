@@ -40,7 +40,7 @@ Vue.component('hypervisor', {
   `,
   methods: {
     addInstance: function(name){},
-    update(): function(){
+    update: function(){
       this.$emit('change');
     }
   }
