@@ -36,7 +36,7 @@ class OCServer():
 
     def __init__(self):
         OCServer.ref = Orchestrator()
-        app = flask('openstack-client')
+        app = Flask('openstack-client')
         CORS(app)
         app.register_blueprint(openstack_client, url_prefix='/openstack-client')
         app.run(host='0.0.0.0', port=SERVICE_PORT)

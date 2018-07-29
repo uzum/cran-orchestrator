@@ -49,11 +49,25 @@
             </div>
           </div>
         </div>
+        <div class="col-md">
+          <h2>openstack-client</h2>
+          <div id="oc-vue-app">
+            <div id="hypervisor-container" class="row">
+              <hypervisor
+                v-for="hypervisor in hypervisors"
+                v-bind:key="hypervisor.id"
+                v-bind:hypervisor="hypervisor"
+                v-on:change="update"
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="./javascript/load-generator.js"></script>
     <script src="./javascript/resource-mapper.js"></script>
+    <script src="./javascript/openstack-client.js"></script>
   </body>
 </html>
