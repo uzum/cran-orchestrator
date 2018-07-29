@@ -6,14 +6,14 @@ from .config import *
 load_generator = Blueprint('load_generator', __name__)
 
 class LGServer():
-    ref = None 
-    
+    ref = None
+
     def __init__(self):
         LGServer.ref = LoadGenerator()
         app = Flask('load-generator')
         CORS(app)
         app.register_blueprint(load_generator, url_prefix='/load-generator')
-        app.run(host='0.0.0.0', port=SERVICE_PORT)
+        app.run(host='0.0.0.0', port=LG_SERVICE_PORT)
 
     @load_generator.route("/configuration", methods=['GET'])
     def getConfiguration():

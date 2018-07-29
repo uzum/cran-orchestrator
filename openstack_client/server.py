@@ -39,7 +39,7 @@ class OCServer():
         app = Flask('openstack-client')
         CORS(app)
         app.register_blueprint(openstack_client, url_prefix='/openstack-client')
-        app.run(host='0.0.0.0', port=SERVICE_PORT)
+        app.run(host='0.0.0.0', port=OC_SERVICE_PORT)
 
     # returns the list of hypervisors registered to openstack
     @openstack_client.route("/hypervisor/all", methods=['GET'])
