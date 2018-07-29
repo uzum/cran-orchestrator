@@ -58,14 +58,16 @@ const OC = new Vue({
   },
   methods: {
     update: function(){
-      axios.get(`${OCServerURL}/hypervisor/all`).then((hypervisors) => {
+      axios.get(`${OCServerURL}/hypervisor/all`).then((response) => {
         while (this.hypervisors.length) this.hypervisors.pop();
-        return Promise.map(hypervisors, (hypervisor) => {
+        return Promise.all(response.data.map((hypervisor) => {
           return axios.get(`${OCServerURL}/hypervisor/${hypervisor.hostname}/instances`)
-            .then((instances) => {
-              this.hypervisors.push(Object.assign({ instances }, hypervisor));
+            .then((hvResponse) => {
+              this.hypervisors.push(Object.assign({
+                instances: hvResponse.data
+              }, hypervisor));
             });
-        });
+        }));
       }).catch(function(error){
         console.log(error);
       });
