@@ -3,13 +3,21 @@ const OCServerURL = '/openstack-client';
 Vue.component('instance', {
   props: ['instance'],
   template: `
-    <span>{{ instance.name }}</span>
-  `,
-  created: function(){
-    console.log(this.instance);
-  },
+    <hr>
+    <b>{{ instance.name }}</b><br />
+    <b>ID:</b> {{ instance.id }}<br />
+    <b>Status:</b> {{ instance.status }}<br />
+    <b>Addresses:</b><br />
+    <p v-for="address in instance.addresses">
+      <b>{{ address.type }}:</b> {{ address.addr }}<br />
+    </p>
+    <button class="btn btn-danger" v-on:click="delete">Delete</button>
+    <hr>
+    `,
   methods: {
-    remove: function(){},
+    delete: function(){
+      this.$emit('delete', this.name);
+    },
     migrate: function(){}
   }
 })
@@ -17,7 +25,7 @@ Vue.component('instance', {
 Vue.component('hypervisor', {
   props: ['hypervisor'],
   template: `
-    <div class="col-md-6">
+    <div class="col-md-12">
       <div class="card border-info" style="margin-bottom: 20px;">
         <div class="card-header">
           <b>Hypervisor#{{ hypervisor.id }}</b><br />
@@ -31,17 +39,43 @@ Vue.component('hypervisor', {
               v-for="instance in hypervisor.instances"
               v-bind:instance="instance"
               v-bind:key="instance.id"
-              v-on:change="update()"
+              v-on:change="update"
+              v-on:delete="deleteInstance"
             ></li>
+            <li>
+              <div class="input-group">
+                <input v-model="newInstance.name" type="text" class="form-control" placeholder="Instance name">
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary" type="button" v-on:click="createInstance">Create new</button>
+                </div>
+              </div>
+            </li>
           </ul>
         </div>
       </div>
     </div>
   `,
   methods: {
-    addInstance: function(name){},
+    createInstance: function(){
+      axios.post(`${OCServerURL}/instance/create?name=${this.newInstance.name}`)
+        .then((response) => {
+          this.$emit('change');
+        })
+        .catch(function(error){
+          console.log(error);
+        });
+    },
     update: function(){
       this.$emit('change');
+    },
+    deleteInstance: function(instanceName){
+      axios.post(`${OCServerURL}/instance/${instanceName}/delete`)
+        .then((response) => {
+          this.$emit('change');
+        })
+        .catch(function(error){
+          console.log(error);
+        });
     }
   }
 });
@@ -50,7 +84,10 @@ const OC = new Vue({
   el: '#oc-vue-app',
   data: function(){
     return {
-      hypervisors: []
+      hypervisors: [],
+      newInstance: {
+        name: ''
+      }
     };
   },
   created: function(){

@@ -75,5 +75,4 @@ class OCServer():
     # deletes the given instance
     @openstack_client.route("/instance/<name>/delete", methods=['POST'])
     def deleteInstance(name):
-        return True
-        # return OCServer.ref.delete_instance(name)
+        return OCServer.ref.delete_instance(name)
