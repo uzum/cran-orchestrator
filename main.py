@@ -3,7 +3,7 @@ from optparse import OptionParser
 from load_generator import LGServer
 from resource_mapper import RMServer
 from control_panel import CPServer
-# from openstack_client import OCServer
+from openstack_client import OCServer
 from log_collector import LCServer
 
 if __name__ == "__main__":
