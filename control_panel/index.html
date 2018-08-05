@@ -7,6 +7,7 @@
           href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
           integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
           crossorigin="anonymous">
+    <link rel="stylesheet" href="./css/cran-orchestrator.css"></link>
   </head>
   <body>
     <div class="container">
@@ -54,7 +55,7 @@
           <div id="oc-vue-app">
             <div id="hypervisor-container" class="row">
               <hypervisor
-                v-for="hypervisor in hypervisors"
+                v-for="hypervisor in orderedHypervisors"
                 v-bind:key="hypervisor.id"
                 v-bind:hypervisor="hypervisor"
                 v-on:change="update"

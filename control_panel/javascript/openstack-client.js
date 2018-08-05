@@ -1,4 +1,5 @@
 const OCServerURL = '/openstack-client';
+const CONTROLLER_HOSTNAME = '5G-1'
 
 Vue.component('instance', {
   props: ['instance'],
@@ -29,14 +30,17 @@ Vue.component('hypervisor', {
   template: `
     <div class="col-md-12">
       <div class="card border-info" style="margin-bottom: 20px;">
-        <div class="card-header">
+        <div class="card-header" v-bind:class="hypervisorClass">
           <b>Hypervisor#{{ hypervisor.id }}</b><br />
-          <b>Hostname: </b><span>{{ hypervisor.hostname }}</span><br />
-          <b>IP: </b><span>{{ hypervisor.host_ip }}</span>
         </div>
         <div class="card-body">
+          <p>
+            <b>Hostname: </b><span>{{ hypervisor.hostname }}</span><br />
+            <b>IP: </b><span>{{ hypervisor.host_ip }}</span>
+          </p>
           <ul class="list-group list-group-flush">
             <li
+              class="hypervisor-list-item"
               is="instance"
               v-for="instance in hypervisor.instances"
               v-bind:instance="instance"
@@ -44,7 +48,7 @@ Vue.component('hypervisor', {
               v-on:change="update"
               v-on:delete="deleteInstance"
             ></li>
-            <li>
+            <li v-if="!hypervisor.isController">
               <div class="input-group">
                 <input v-model="hypervisor.newInstance.name" type="text" class="form-control" placeholder="Instance name">
                 <div class="input-group-append">
@@ -57,6 +61,14 @@ Vue.component('hypervisor', {
       </div>
     </div>
   `,
+  computed: {
+    hypervisorClass: function(){
+      return {
+        'bg-info': !this.hypervisor.isController,
+        'bg-secondary': this.hypervisor.isController
+      };
+    }
+  },
   methods: {
     createInstance: function(){
       axios.post(`${OCServerURL}/instance?name=${this.hypervisor.newInstance.name}`)
@@ -89,6 +101,11 @@ const OC = new Vue({
       hypervisors: []
     };
   },
+  computed: {
+    orderedHypervisors: function(){
+      return this.hypervisors.sort((a, b) => a.hostname.localeCompare(b.hostname));
+    }
+  },
   created: function(){
     this.update();
   },
@@ -101,7 +118,8 @@ const OC = new Vue({
             .then((hvResponse) => {
               this.hypervisors.push(Object.assign({
                 instances: hvResponse.data,
-                newInstance: { name: '' }
+                newInstance: { name: '' },
+                isController: hypervisor.hostname === CONTROLLER_HOSTNAME
               }, hypervisor));
             });
         }));

@@ -22,7 +22,7 @@ Vue.component('openstack-node', {
   template: `
     <div class="col-md-6">
       <div class="card" style="margin-bottom: 20px">
-        <div class="card-header">
+        <div class="card-header bg-info">
           <b>{{ node.id }}</b><br />
           <span
             class="badge" v-bind:class="badgeClass">{{ type }}</span>
@@ -89,7 +89,7 @@ Vue.component('mapping', {
   template: `
     <div class="col-md-12">
       <div class="card" style="margin-bottom: 20px;">
-        <div class="card-header">
+        <div class="card-header bg-success">
           <b>RRH#{{ rule.rrh }}</b> <span class="badge badge-dark">Rule#{{ rule.id }}</span>
           <button type="button" class="close" v-on:click="remove">&times;</button>
         </div>

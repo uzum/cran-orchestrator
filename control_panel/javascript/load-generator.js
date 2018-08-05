@@ -4,7 +4,7 @@ Vue.component('new-remote-radio-head', {
   template: `
     <div class="col-md-6">
       <div class="card" style="margin-bottom: 20px;">
-        <div class="card-header">
+        <div class="card-header bg-secondary">
           <b>Create new RRH</b>
         </div>
         <div class="card-body">
@@ -37,7 +37,7 @@ Vue.component('remote-radio-head', {
   template: `
     <div class="col-md-6">
       <div class="card" style="margin-bottom: 20px;">
-        <div class="card-header">
+        <div class="card-header bg-warning">
           <b>RRH#{{ rrh.id }}</b>
           <button type="button" class="close" v-on:click="remove">&times;</button>
         </div>
