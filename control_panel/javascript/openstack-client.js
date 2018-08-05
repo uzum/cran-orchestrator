@@ -3,6 +3,11 @@ const CONTROLLER_HOSTNAME = '5G-1'
 
 Vue.component('instance', {
   props: ['instance'],
+  data: function(){
+    return {
+      targetHypervisor: ''
+    };
+  },
   template: `
     <div>
       <hr>
@@ -10,10 +15,18 @@ Vue.component('instance', {
       <b>ID:</b> {{ instance.id }}<br />
       <b>Status:</b> {{ instance.status }}<br />
       <b>Addresses:</b><br />
-      <p v-for="address in instance.addresses" v-bind:address="address">
+      <p v-for="address in instance.addresses">
         <b>{{ address.type }}:</b> {{ address.addr }}<br />
       </p>
-      <button class="btn btn-danger" v-on:click="deleteInstance">Delete</button>
+      <div class="row">
+        <div class="col-md"><button class="btn btn-danger" v-on:click="deleteInstance">Delete</button></div>
+        <div class="input-group col-md">
+          <div class="input-group-prepend">
+            <button class="btn btn-outline-secondary" type="button" v-on:click="migrate">Migrate to: </button>
+          </div>
+          <input type="text" class="form-control" v-model="targetHypervisor">
+        </div>
+      </div>
       <hr>
     </div>
     `,
@@ -21,7 +34,9 @@ Vue.component('instance', {
     deleteInstance: function(){
       this.$emit('delete', this.instance.name);
     },
-    migrate: function(){}
+    migrate: function(){
+      this.$emit('migrate', this.instance.name, this.targetHypervisor);
+    }
   }
 })
 
@@ -47,6 +62,7 @@ Vue.component('hypervisor', {
               v-bind:key="instance.id"
               v-on:change="update"
               v-on:delete="deleteInstance"
+              v-on:migrate="migrateInstance"
             ></li>
             <li v-if="!hypervisor.isController">
               <div class="input-group">
@@ -81,6 +97,20 @@ Vue.component('hypervisor', {
     },
     update: function(){
       this.$emit('change');
+    },
+    migrateInstance: function(instanceName, targetHypervisor){
+      if (targetHypervisor !== this.hypervisor.hostname) {
+        console.log(`migrating the instance ${instanceName} to ${targetHypervisor}`);
+        axios.post(`${OCServerURL}/instance/${instanceName}/migrate?target=${targetHypervisor}`)
+          .then((response) => {
+            this.$emit('change');
+          })
+          .catch(function(error){
+            console.log(error);
+          });
+      } else {
+        console.log(`the instance ${instanceName} is already located in ${targetHypervisor}`);
+      }
     },
     deleteInstance: function(instanceName){
       axios.post(`${OCServerURL}/instance/${instanceName}/delete`)
