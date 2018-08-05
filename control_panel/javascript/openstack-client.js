@@ -55,7 +55,6 @@ Vue.component('hypervisor', {
           </p>
           <ul class="list-group list-group-flush">
             <li
-              class="hypervisor-list-item"
               is="instance"
               v-for="instance in hypervisor.instances"
               v-bind:instance="instance"
@@ -64,7 +63,7 @@ Vue.component('hypervisor', {
               v-on:delete="deleteInstance"
               v-on:migrate="migrateInstance"
             ></li>
-            <li v-if="!hypervisor.isController">
+            <li class="new-instance-item" v-if="!hypervisor.isController">
               <div class="input-group">
                 <input v-model="hypervisor.newInstance.name" type="text" class="form-control" placeholder="Instance name">
                 <div class="input-group-append">
