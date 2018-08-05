@@ -59,7 +59,10 @@ class OCServer():
     # creates a new instance with the given parameters
     @openstack_client.route("/instance", methods=['POST'])
     def createInstance():
-        return jsonify(getInstanceDetails(OCServer.ref.create_default_instance(name=request.args.get("name"))))
+        return jsonify(getInstanceDetails(OCServer.ref.create_default_instance(
+            name=request.args.get("name"),
+            availabilityZoneHostname=request.args.get("zone")
+        )))
 
     # live-migrates the given instance to the target hypervisor with the given hostname
     @openstack_client.route("/instance/<name>/migrate", methods=['POST'])

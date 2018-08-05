@@ -71,7 +71,7 @@ Vue.component('hypervisor', {
   },
   methods: {
     createInstance: function(){
-      axios.post(`${OCServerURL}/instance?name=${this.hypervisor.newInstance.name}`)
+      axios.post(`${OCServerURL}/instance?name=${this.hypervisor.newInstance.name}&zone=${this.hypervisor.hostname}`)
         .then((response) => {
           this.$emit('change');
         })
