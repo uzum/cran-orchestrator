@@ -18,10 +18,10 @@ class OSClientAPI():
         return requests.post(self.pathPrefix + path, data=data, headers=headers)
 
     def hypervisors(self):
-        return self.requestGet('/openstack-client/hypervisor/all')
+        return self.requestGet('/openstack-client/hypervisor/all').json()
 
     def instances(self, hypervisor):
-        return self.requestGet('/openstack-client/hypervisor/' + hypervisor['hostname'] + '/instances')
+        return self.requestGet('/openstack-client/hypervisor/' + hypervisor['hostname'] + '/instances').json()
 
 class ODLRestConfAPI():
     def __init__(self):
