@@ -66,7 +66,7 @@ class Orchestrator(object):
         instance = self.nova_client.servers.create(name=name,
                                                    image=self.DEFAULT_IMAGE,
                                                    flavor=self.DEFAULT_FLAVOR,
-                                                   avail_zone="nova:" + availabilityZoneHostname)
+                                                   availability_zone="nova:" + availabilityZoneHostname)
         return instance
 
     def create_instance(self, vm_name, image, flavor, key_name,
