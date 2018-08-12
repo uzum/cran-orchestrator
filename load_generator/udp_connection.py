@@ -30,7 +30,9 @@ class UDPConnection():
         self.sequenceNumber = self.sequenceNumber + 1
 
     def setArrivalRate(self, rate):
+        self.nextPacketScheduler.cancel()
         self.arrivalRate = rate
+        self.sendPacket()
 
     def close(self):
         print('closing socket ' + self.name)
