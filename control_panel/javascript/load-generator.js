@@ -45,6 +45,13 @@ Vue.component('remote-radio-head', {
           <p><b>Target UDP Port: </b>{{ rrh.dstPort }}</p>
           <hr>
           <p>
+            <span class="badge" v-bind:class="badgeClass">{{ rrh.state }}</span>
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-light" v-on:click="start">Start</button>
+              <button type="button" class="btn btn-light" v-on:click="stop">Stop</button>
+            </div>
+          </p>
+          <p>
             <b>Connections: </b>
             <span>{{ rrh.connections.length }}</span>
             <button v-on:click="removeConnection" type="button" style="border-radius: 50%;" class="btn btn-primary">-</button>
@@ -70,6 +77,11 @@ Vue.component('remote-radio-head', {
     </div>
   `,
   props: ['rrh'],
+  computed: {
+    badgeClass: function(){
+      return this.rrh.state === 'running' ? 'badge-success' : 'badge-dark';
+    }
+  },
   methods: {
     remove: function(){
       axios.post(`${LGServerURL}/rrh/${this.rrh.id}/remove`)
@@ -100,6 +112,24 @@ Vue.component('remote-radio-head', {
     },
     setRateParameter: function(){
       axios.post(`${LGServerURL}/rrh/${this.rrh.id}/set-arrival-rate?rate=${this.rrh.arrivalRate}`)
+        .then((response) => {
+          this.$emit('change');
+        })
+        .catch(function(error){
+          console.log(error);
+        });
+    },
+    start: function(){
+      axios.post(`${LGServerURL}/rrh/${this.rrh.id}/start`)
+        .then((response) => {
+          this.$emit('change');
+        })
+        .catch(function(error){
+          console.log(error);
+        });
+    },
+    stop: function(){
+      axios.post(`${LGServerURL}/rrh/${this.rrh.id}/stop`)
         .then((response) => {
           this.$emit('change');
         })
