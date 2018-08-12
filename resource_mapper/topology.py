@@ -1,7 +1,12 @@
+import socket
+
+HOST_VM_IP = socket.gethostbyname(socket.gethostname())
+
 class Switch():
     def __init__(self, id):
         self.id = id
         self.hosts = []
+        self.isController = False
 
     def addHost(self, host):
         self.hosts.append(host)
@@ -9,6 +14,11 @@ class Switch():
     def getForwardingAddress(self):
         if not self.hosts:
             raise IndexError('switch #' + self.id + ' does not have any hosts at the moment')
+        if self.isController:
+            for host in self.hosts:
+                if host.ip == HOST_VM_IP:
+                    return host
+            raise IndexError('switch #' + self.id + ' is controller but does not have host vm')
         return self.hosts[0]
 
     def toObject(self):
@@ -85,6 +95,7 @@ class Topology():
         for switch in self.computeNodeSwitches:
             if switch.id == id:
                 self.controllerNodeSwitch = switch
+                self.controllerNodeSwitch.isController = True
         self.computeNodeSwitches = [switch for switch in self.computeNodeSwitches if switch.id != id]
 
     def getTargetNodes(self, hostIDs):
