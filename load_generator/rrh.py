@@ -27,6 +27,8 @@ class RRH():
                 'arrivalRate': self.arrivalRate
             })
             self.connections.append(connection)
+            if (self.state == 'running'):
+                connection.start()
 
     def removeConnection(self, amount=1):
         for idx in range(amount):
