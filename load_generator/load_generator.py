@@ -1,5 +1,8 @@
 from .rrh import RRH
 from .config import *
+import socket
+
+TARGET_IP = socket.gethostbyname(socket.gethostname())
 
 class LoadGenerator():
     nextId = -1
