@@ -14,6 +14,7 @@ class RRH():
         self.dstPort = options['dstPort']
         self.dstIP = options['dstIP']
         self.connections = []
+        self.state = 'stopped'
         self.arrivalRate = options['arrivalRate']
         self.addConnection(options['connectionNumber'])
 
@@ -25,7 +26,6 @@ class RRH():
                 'dstPort': self.dstPort,
                 'arrivalRate': self.arrivalRate
             })
-            connection.start()
             self.connections.append(connection)
 
     def removeConnection(self, amount=1):
@@ -38,6 +38,16 @@ class RRH():
         for connection in self.connections:
             connection.setArrivalRate(rate)
 
+    def stop(self):
+        for connection in self.connections:
+            connection.stop()
+        self.state = 'stopped'
+
+    def start(self):
+        for connection in self.connections:
+            connection.start()
+        self.state = 'running'
+
     def destroy(self):
         for connection in self.connections:
             connection.close()
@@ -47,5 +57,6 @@ class RRH():
            'id': self.id,
            'dstPort': self.dstPort,
            'arrivalRate': self.arrivalRate,
-           'connections': [connection.toObject() for connection in self.connections]
+           'connections': [connection.toObject() for connection in self.connections],
+           'state': self.state
        }

@@ -42,6 +42,18 @@ class LoadGenerator():
         self.rrhs.append(rrh)
         return rrh.toObject()
 
+    def stopRRH(self, rrhId):
+        for rrh in self.rrhs:
+            if (rrh.id == rrhId):
+                rrh.stop()
+                return rrh.toObject()
+
+    def startRRH(self, rrhId):
+        for rrh in self.rrhs:
+            if (rrh.id == rrhId):
+                rrh.start()
+                return rrh.toObject()
+
     def setArrivalRate(self, rrhId, rate):
         for rrh in self.rrhs:
             if (rrh.id == rrhId):

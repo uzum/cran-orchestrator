@@ -28,6 +28,14 @@ class LGServer():
         LGServer.ref.removeRRH(int(id))
         return jsonify({ 'success': True })
 
+    @load_generator.route("/rrh/<id>/stop", methods=['POST'])
+    def stopRRH(id):
+        return jsonify(LGServer.ref.stopRRH(int(id)))
+
+    @load_generator.route("/rrh/<id>/start", methods=['POST'])
+    def startRRH(id):
+        return jsonify(LGServer.ref.startRRH(int(id)))
+
     @load_generator.route("/rrh/<id>/set-arrival-rate", methods=['POST'])
     def setArrivalRate(id):
         return jsonify(LGServer.ref.setArrivalRate(int(id), float(request.args.get('rate'))))

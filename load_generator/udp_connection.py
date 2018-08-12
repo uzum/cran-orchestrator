@@ -30,23 +30,30 @@ class UDPConnection():
         self.sequenceNumber = self.sequenceNumber + 1
 
     def setArrivalRate(self, rate):
-        self.nextPacketScheduler.cancel()
-        self.arrivalRate = rate
-        self.sendPacket()
+        self.arrivalRate = rate;
+        if (self.nextPacketScheduler is not None):
+            self.nextPacketScheduler.cancel()
+            self.sendPacket()
 
     def close(self):
         print('closing socket ' + self.name)
         self.nextPacketScheduler.cancel()
+        self.nextPacketScheduler = None
         self.socket.close()
+
+    def start(self):
+        self.sendPacket()
+
+    def stop(self):
+        if (self.nextPacketScheduler is not None):
+            self.nextPacketScheduler.cancel()
+            self.nextPacketScheduler = None
 
     def createPayload(self):
         return json.dumps({
             'name': self.name,
             'seq': self.sequenceNumber
         }) + "\n"
-
-    def start(self):
-        self.sendPacket()
 
     def toObject(self):
         return {
