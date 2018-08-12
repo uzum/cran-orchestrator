@@ -19,7 +19,9 @@ class Mapping():
         return {
             'id': self.id,
             'rrh': self.rrhId,
-            'bbus': self.bbuList
+            'bbus': self.bbuList,
+            'flows': [flow.xml() for flow in self.flows],
+            'groups': [group.xml() for group in self.groups]
         }
 
 class ResourceMapper():
