@@ -2,4 +2,5 @@ python-keystoneclient
 python-glanceclient
 python-neutronclient
 python-novaclient
-
+flask
+flask_cors
