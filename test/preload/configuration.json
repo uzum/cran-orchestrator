@@ -1,0 +1,18 @@
+{
+  "rrhs": [{
+    "rate": 0.1,
+    "connections": 4
+  }, {
+    "rate": 0.2,
+    "connections": 8
+  }, {
+    "rate": 0.2,
+    "connections": 5
+  }, {
+    "rate": 0.3,
+    "connections": 3
+  }, {
+    "rate": 0.3,
+    "connections": 5
+  }]
+}
