@@ -1,0 +1,39 @@
+{
+  "rrhs": [{
+    "rate": 0.1,
+    "connections": 4,
+    "bbus": ["BBU#1"]
+  }, {
+    "rate": 0.2,
+    "connections": 8,
+    "bbus": ["BBU#2"]
+  }, {
+    "rate": 0.2,
+    "connections": 5,
+    "bbus": ["BBU#3"]
+  }, {
+    "rate": 0.3,
+    "connections": 3,
+    "bbus": ["BBU#4", "BBU#5"]
+  }, {
+    "rate": 0.3,
+    "connections": 5,
+    "bbus": ["BBU#5"]
+  }],
+  "bbus": [{
+    "name": "BBU#1",
+    "zone": "5G-2"
+  }, {
+    "name": "BBU#2",
+    "zone": "5G-3"
+  }, {
+    "name": "BBU#3",
+    "zone": "5G-4"
+  }, {
+    "name": "BBU#4",
+    "zone": "5G-2"
+  }, {
+    "name": "BBU#5",
+    "zone": "5G-3"
+  }]
+}
