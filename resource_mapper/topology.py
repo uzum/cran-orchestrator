@@ -108,3 +108,13 @@ class Topology():
             if (hosts):
                 targets.append({ 'switch' : switch, 'hosts': hosts })
         return targets
+
+    def getHostIdByIP(self, ip):
+        for switch in self.computeNodeSwitches:
+            for host in switch.hosts:
+                if (host.ip == ip):
+                    return host.id
+        for switch in self.controllerNodeSwitch:
+            for host in switch.hosts:
+                if (host.ip == ip):
+                    return host.id

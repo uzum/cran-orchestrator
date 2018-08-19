@@ -22,7 +22,10 @@ class RMServer():
     @resource_mapper.route("/mapping", methods=['POST'])
     def addMapping():
         rrh = int(request.args.get('rrh'))
-        bbus = [int(id) for id in request.args.get('bbus').split(',')]
+        if (request.args.get('format') is None or request.args.get('format') == 'id'):
+            bbus = [int(id) for id in request.args.get('bbus').split(',')]
+        else:
+            bbus = [RMServer.ref.getHostIdByIP(ip) for ip in request.args.get('bbus').split(',')]
         return jsonify(RMServer.ref.addMapping(rrh, bbus).objectify())
 
     @resource_mapper.route("/mapping/<id>/remove", methods=['POST'])

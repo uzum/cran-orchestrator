@@ -263,3 +263,6 @@ class ResourceMapper():
 
     def removeGroup(self, group):
         self.ODLAPI.removeGroup(group)
+
+    def getHostIdByIP(self, ip):
+        return self.topology.getHostIdByIP(ip)
