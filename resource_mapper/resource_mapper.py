@@ -38,6 +38,10 @@ class ResourceMapper():
     def getTopology(self):
         return self.topology
 
+    def updateTopology(self):
+        self.topology.discover(self.ODLAPI.topology())
+        return self.topology
+
     def discoverControllerNode(self):
         # retrieve all the hypervisors in the openstack
         hypervisors = self.OSAPI.hypervisors()

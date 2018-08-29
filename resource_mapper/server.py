@@ -41,6 +41,10 @@ class RMServer():
     def getTopology():
         return jsonify(RMServer.ref.getTopology().objectify())
 
+    @resource_mapper.route("/topology/update", methods=['POST'])
+    def updateTopology():
+        return jsonify(RMServer.ref.updateTopology().objectify())
+
     @resource_mapper.route("/topology/set-controller", methods=['POST'])
     def setControllerNodeSwitch():
         RMServer.ref.setControllerNodeSwitch(request.args.get('id'))
