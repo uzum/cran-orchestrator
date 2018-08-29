@@ -1,5 +1,3 @@
-const LGServerURL = '/load-generator';
-
 Vue.component('new-remote-radio-head', {
   template: `
     <div class="col-md-6">

@@ -1,7 +1,3 @@
-const OCServerURL = '/openstack-client';
-const RMServerURL = '/resource-mapper';
-const CONTROLLER_HOSTNAME = '5G-1'
-
 Vue.component('instance', {
   props: ['instance'],
   data: function(){

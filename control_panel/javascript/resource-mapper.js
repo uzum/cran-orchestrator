@@ -1,5 +1,3 @@
-const RMServerURL = '/resource-mapper';
-
 Vue.component('openstack-host', {
   props: ['host'],
   template: `
