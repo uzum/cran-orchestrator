@@ -2,8 +2,6 @@ from .rrh import RRH
 from .config import *
 import socket
 
-TARGET_IP = socket.gethostbyname(socket.gethostname())
-
 class LoadGenerator():
     nextId = -1
 
@@ -18,7 +16,7 @@ class LoadGenerator():
             self.rrhs.append(RRH({
                 'id': id,
                 'dstPort': BASE_PORT + id + 1,
-                'dstIP': TARGET_IP,
+                'dstIP': BROADCAST_ADDRESS,
                 'connectionNumber': connectionNumber,
                 'arrivalRate': arrivalRate
             }))
@@ -35,7 +33,7 @@ class LoadGenerator():
         rrh = RRH({
             'id': id,
             'dstPort': BASE_PORT + id + 1,
-            'dstIP': TARGET_IP,
+            'dstIP': BROADCAST_ADDRESS,
             'connectionNumber': 0,
             'arrivalRate': arrivalRate
         })

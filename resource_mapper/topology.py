@@ -1,7 +1,5 @@
 import socket
 
-HOST_VM_IP = socket.gethostbyname(socket.gethostname())
-
 class Switch():
     def __init__(self, id):
         self.id = id
@@ -16,9 +14,9 @@ class Switch():
             raise IndexError('switch #' + self.id + ' does not have any hosts at the moment')
         if self.isController:
             for host in self.hosts:
-                if host.ip == HOST_VM_IP:
+                if host.ip == BROADCAST_ADDRESS:
                     return host
-            raise IndexError('switch #' + self.id + ' is controller but does not have host vm')
+            raise IndexError('switch #' + self.id + ' is controller but does not have a port for the broadcast address')
         return self.hosts[0]
 
     def toObject(self):
