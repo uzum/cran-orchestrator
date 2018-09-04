@@ -11,7 +11,7 @@ Vue.component('history-entry', {
       <div class="col-md-2">
         <span v-bind:class="sourceClass">{{ entry.source }}</span>
       </div>
-      <div class="col-md-6">
+      <div class="col-md-8">
         <code>{{ payload }}</code>
       </div>
     </div>
