@@ -1,5 +1,28 @@
-const classes = ['primary', 'secondary', 'dark', 'light', 'info', 'warning', 'success', 'danger'];
-const assignedClasses = new Map();
+const ColorCoder = (function(){
+  const colorSet = ['primary', 'secondary', 'dark', 'light', 'info', 'warning', 'success', 'danger']
+  const available = colorSet.slice(0);
+  const assignments = new Map();
+
+  return {
+    get: function(source){
+      if (assignments.has(source)) return assignments.get(source);
+
+      // make a new assignment
+      const color = available.shift();
+      assignments.set(source, color);
+      if (available.length === 0) {
+        available = colorSet.slice(0);
+      }
+      return color;
+    },
+    release: function(source){
+      if (!assignments.has(source)) return;
+      const color = assignments.get(source);
+      assignments.delete(source);
+      available.push(color);
+    }
+  }
+})();
 
 Vue.component('history-entry', {
   props: ['entry'],
@@ -27,13 +50,7 @@ Vue.component('history-entry', {
       return object;
     },
     sourceClass: function(){
-      if (assignedClasses.has(this.entry.source)) {
-        return assignedClasses.get(this.entry.source);
-      } else {
-        const assignedClass = `badge badge-${classes[Math.floor(Math.random() * classes.length)]}`;
-        assignedClasses.set(this.entry.source, assignedClass);
-        return assignedClass;
-      }
+      return `badge badge-${ColorCoder.get(this.entry.source)}`;
     }
   }
 });
