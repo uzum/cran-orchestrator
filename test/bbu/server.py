@@ -6,18 +6,18 @@ import json
 import urllib.request
 from threading import Timer
 
+UDP_LISTEN_PORT = 3000
 REPORT_INTERVAL = 10.0
-LOG_COLLECTOR_ADDRESS = 'http://127.0.0.1:5004/log-collector/append'
 
 parser = argparse.ArgumentParser()
 parser.add_argument("name")
-parser.add_argument("port")
+parser.add_argument("address")
 args = parser.parse_args()
 
 reportTimer = None
 packetCount = 0
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server_socket.bind(('', int(args.port)))
+server_socket.bind(('', UDP_LISTEN_PORT))
 
 def report():
     cpuUtilization = round(float(os.popen('''grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage }' ''').readline()))
@@ -30,12 +30,12 @@ def report():
         'cpuUtilization': cpuUtilization,
         'memoryUtilization': memoryUtilization
     }
-    request = urllib.request.Request(LOG_COLLECTOR_ADDRESS, json.dumps(payload).encode('utf-8'), { 'Content-Type': 'application/json' })
+    request = urllib.request.Request(args.address, json.dumps(payload).encode('utf-8'), { 'Content-Type': 'application/json' })
     response = urllib.request.urlopen(request)
     timer = Timer(REPORT_INTERVAL, report)
     timer.start()
 
-print('listening to ' + args.port)
+print('listening to ' + str(UDP_LISTEN_PORT))
 report()
 
 while True:
