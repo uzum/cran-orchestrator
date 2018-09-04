@@ -49,7 +49,7 @@ Vue.component('log-history', {
       </div>
       <history-entry
         v-for="entry in history"
-        v-bind:key="entry.timestamp"
+        v-bind:key="entry.timestamp + entry.source"
         v-bind:entry="entry"
       />
     </div>
