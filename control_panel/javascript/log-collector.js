@@ -80,7 +80,7 @@ const LC = new Vue({
   el: '#lc-vue-app',
   data: function(){
     return {
-      lastSeenIndex: 0,
+      lastSeenTimestamp: 0,
       history: []
     };
   },
@@ -89,14 +89,18 @@ const LC = new Vue({
   },
   methods: {
     peek: function(){
-      axios.get(`${LCServerURL}/peek?index=${this.lastSeenIndex}`)
+      axios.get(`${LCServerURL}/peek?timestamp=${this.lastSeenTimestamp}`)
         .then((response) => {
           response.data.forEach(entry => {
             this.history.push(entry);
             if (this.history.length > HISTORY_CAPACITY) this.history.shift();
           });
           setTimeout(this.peek, PEEK_INTERVAL);
-          this.lastSeenIndex += response.data.length;
+
+          // update the last seen timestamp for next peek request
+          if (response.data[0]) {
+            this.lastSeenTimestamp = response.data[0].timestamp;
+          }
         })
         .catch((error) => {
           console.log(error);
