@@ -22,6 +22,10 @@ def getAddressDetails(address):
         'addr': address['addr']
     }
 
+# returns a userdata string for the instance to be created
+def prepareUserdata(name):
+    return ''
+
 # returns a simplifed representation of an instance
 def getInstanceDetails(instance):
     if DEFAULT_NETWORK_LABEL not in instance.addresses:
@@ -61,14 +65,14 @@ class OCServer():
     def createInstance():
         return jsonify(getInstanceDetails(OCServer.ref.create_default_instance(
             name=request.args.get("name"),
-            availabilityZoneHostname=request.args.get("zone")
+            availabilityZoneHostname=request.args.get("zone"),
+            prepareUserdata(request.args.get("name"))
         )))
 
     # live-migrates the given instance to the target hypervisor with the given hostname
     @openstack_client.route("/instance/<name>/migrate", methods=['POST'])
     def migrateInstance(name):
-        return True
-        # return jsonify(getInstanceDetails(OCServer.ref.live_migrate_instance(name, request.args.get("target"))))
+        return jsonify(getInstanceDetails(OCServer.ref.live_migrate_instance(name, request.args.get("target"))))
 
     # deletes the given instance
     @openstack_client.route("/instance/<name>/delete", methods=['POST'])
