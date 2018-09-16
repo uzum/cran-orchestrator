@@ -14,7 +14,7 @@ parser.add_argument("name")
 parser.add_argument("address")
 args = parser.parse_args()
 
-reportTimer = None
+timer = None
 packetCount = 0
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 server_socket.bind(('', UDP_LISTEN_PORT))

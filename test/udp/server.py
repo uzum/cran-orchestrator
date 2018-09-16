@@ -10,7 +10,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("port")
 args = parser.parse_args()
 
-reportTimer = None
+timer = None
 packetCount = 0
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 server_socket.bind(('', int(args.port)))
