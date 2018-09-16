@@ -21,6 +21,5 @@ def check():
     else:
         print('ODL is still running')
         checkInterval = Timer(waitDuration, check)
-        checkInterval.start()
-
+    checkInterval.start()
 check()
