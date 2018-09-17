@@ -10,8 +10,8 @@ UDP_LISTEN_PORT = 3000
 REPORT_INTERVAL = 10.0
 
 parser = argparse.ArgumentParser()
-parser.add_argument("name")
-parser.add_argument("address")
+parser.add_argument('name')
+parser.add_argument('address')
 args = parser.parse_args()
 
 timer = None

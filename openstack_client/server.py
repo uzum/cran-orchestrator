@@ -25,7 +25,7 @@ def getAddressDetails(address):
 
 # returns a userdata string for the instance to be created
 def prepareUserdata(name):
-    with open(os.path.join(dirname, '../tools/bbu-server.py'), 'r') as bbuScript:
+    with open(os.path.join(os.path.dirname(__file__), '../tools/bbu-server.py'), 'r') as bbuScript:
         return '''#!/bin/sh
 echo "{code}" > /home/ubuntu/server.py
 nohup /home/ubuntu/server.py {name} {address} > /home/ubuntu/server.out &
@@ -71,7 +71,7 @@ class OCServer():
         return jsonify(getInstanceDetails(OCServer.ref.create_default_instance(
             name=request.args.get("name"),
             availabilityZoneHostname=request.args.get("zone"),
-            prepareUserdata(request.args.get("name"))
+            userdata=prepareUserdata(request.args.get("name"))
         )))
 
     # live-migrates the given instance to the target hypervisor with the given hostname
