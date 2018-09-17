@@ -72,7 +72,12 @@ class ResourceMapper():
         print("adding a new rrh-bbu mapping for rrh#" + str(rrhId))
         print("target bbus: " + (", ".join(str(id) for id in bbuList)))
         mapping = Mapping(rrhId, bbuList)
-        targetNodes = self.topology.getTargetNodes(bbuList)
+        self.addMappingRules(mapping)
+        self.mappings.append(mapping)
+        return mapping
+
+    def addMappingRules(self, mapping):
+        targetNodes = self.topology.getTargetNodes(mapping.bbuList)
         if (not targetNodes):
             print("given set of bbus are not found in any switches!")
             return None
@@ -90,7 +95,7 @@ class ResourceMapper():
                         'destination': self.topology.controllerNodeSwitch.getForwardingAddress().ip + '/32'
                     },
                     'udp': {
-                        'destination-port': str(rrhId + RRH_BASE_PORT)
+                        'destination-port': str(mapping.rrhId + RRH_BASE_PORT)
                     }
                 },
                 # instructions
@@ -132,7 +137,7 @@ class ResourceMapper():
                         'destination': self.topology.controllerNodeSwitch.getForwardingAddress().ip + '/32'
                     },
                     'udp': {
-                        'destination-port': str(rrhId + RRH_BASE_PORT)
+                        'destination-port': str(mapping.rrhId + RRH_BASE_PORT)
                     }
                 },
                 # instructions
@@ -158,7 +163,7 @@ class ResourceMapper():
                             'destination': targetNode['switch'].getForwardingAddress().ip + '/32'
                         },
                         'udp': {
-                            'destination-port': str(rrhId + RRH_BASE_PORT)
+                            'destination-port': str(mapping.rrhId + RRH_BASE_PORT)
                         }
                     },
                     # instructions
@@ -205,7 +210,7 @@ class ResourceMapper():
                             'destination': targetNode['switch'].getForwardingAddress().ip + '/32'
                         },
                         'udp': {
-                            'destination-port': str(rrhId + RRH_BASE_PORT)
+                            'destination-port': str(mapping.rrhId + RRH_BASE_PORT)
                         }
                     },
                     #instructions
@@ -214,8 +219,6 @@ class ResourceMapper():
                 )
                 mapping.groups.append(group)
                 mapping.flows.append(flow)
-        self.mappings.append(mapping)
-        return mapping
 
     def removeMapping(self, id):
         for mapping in self.mappings:
@@ -226,15 +229,22 @@ class ResourceMapper():
                     self.removeGroup(group)
         self.mappings = [mapping for mapping in self.mappings if mapping.id != id]
 
-    def onBBUMigration(self, bbuId):
+    def updateMapping(self, mapping):
+        for flow in mapping.flows:
+            self.removeFlow(flow)
+        for group in mapping.groups:
+            self.removeGroup(group)
+        mapping.flows = []
+        mapping.groups = []
+        self.addMappingRules(mapping)
+
+    def onBBUMigration(self, address):
+        bbuId = self.topology.getHostIdByIP(address)
         self.topology.discover(self.ODLAPI.topology())
+
         for mapping in self.mappings:
             if bbuId in mapping.bbuList:
-                for flow in mapping.flows:
-                    self.removeFlow(flow)
-                for group in mapping.groups:
-                    self.removeGroup(group)
-                self.addMapping(mapping.rrhId, mapping.bbuList)
+                self.updateMapping(mapping)
 
     def addForwardingFlow(self, switch, filters, instructions, options):
         print('Creating a forwarding flow in ' + switch.id)

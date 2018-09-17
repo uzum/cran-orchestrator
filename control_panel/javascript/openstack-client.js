@@ -32,7 +32,12 @@ Vue.component('instance', {
       this.$emit('delete', this.instance.name);
     },
     migrate: function(){
-      this.$emit('migrate', this.instance.name, this.targetHypervisor);
+      const privateAddress = this.instance.addresses.find(address => address.addr.startsWith('10.0'));
+      if (!privateAddress) {
+        console.log('the instance does not have a private address');
+      } else {
+        this.$emit('migrate', this.instance.name, privateAddress.addr, this.targetHypervisor);
+      }
     }
   }
 })
@@ -94,14 +99,15 @@ Vue.component('hypervisor', {
     update: function(){
       this.$emit('change');
     },
-    migrateInstance: function(instanceName, targetHypervisor){
+    migrateInstance: function(instanceName, instanceAddr, targetHypervisor){
       if (targetHypervisor !== this.hypervisor.hostname) {
         console.log(`migrating the instance ${instanceName} to ${targetHypervisor}`);
         axios.post(`${OCServerURL}/instance/${instanceName}/migrate?target=${targetHypervisor}`)
           .then((response) => {
+            return axios.post(`${RMServerURL}/topology/bbu-migration?address=${instanceAddr}`);
+          }).then((response) => {
             this.$emit('change');
-          })
-          .catch(function(error){
+          }).catch(function(error){
             console.log(error);
           });
       } else {
