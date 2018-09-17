@@ -1,3 +1,4 @@
+import os
 from flask import Flask, Blueprint, jsonify, request
 from flask_cors import CORS
 from .config import *
@@ -24,7 +25,11 @@ def getAddressDetails(address):
 
 # returns a userdata string for the instance to be created
 def prepareUserdata(name):
-    return ''
+    with open(os.path.join(dirname, '../tools/bbu-server.py'), 'r') as bbuScript:
+        return '''#!/bin/sh
+echo "{code}" > /home/ubuntu/server.py
+nohup /home/ubuntu/server.py {name} {address} > /home/ubuntu/server.out &
+        '''.format(code = bbuScript.read(), name = name, address = LOG_COLLECTOR_ADDRESS)
 
 # returns a simplifed representation of an instance
 def getInstanceDetails(instance):
