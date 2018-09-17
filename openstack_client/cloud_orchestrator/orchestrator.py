@@ -21,6 +21,7 @@ class Orchestrator(object):
         self.DEFAULT_FLAVOR = self.find_flavor(flavor_name=DEFAULT_FLAVOR_NAME)
         self.DEFAULT_SEC_GROUP = self.find_sec_group(name=DEFAULT_SEC_GROUP_NAME)
         self.DEFAULT_NETWORK = self.find_network(label=DEFAULT_NETWORK_LABEL)
+        self.DEFAULT_KEY_NAME = DEFAULT_KEY_NAME
 
     # Find image (For now assume image is uploaded using CLI/Horizon
     def find_image(self, image_name):
@@ -66,6 +67,7 @@ class Orchestrator(object):
         instance = self.nova_client.servers.create(name=name,
                                                    image=self.DEFAULT_IMAGE,
                                                    flavor=self.DEFAULT_FLAVOR,
+                                                   key_name=self.DEFAULT_KEY_NAME,
                                                    userdata=userdata,
                                                    availability_zone="nova:" + availabilityZoneHostname)
         return instance
