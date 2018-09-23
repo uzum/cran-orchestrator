@@ -1,8 +1,32 @@
+import requests
+from .config import *
+
+class RMAPI():
+    def __init__(self):
+        self.remote = RM_SERVER_IP
+        self.port = RM_SERVER_PORT
+        self.pathPrefix = 'http://' + self.remote + ':' + self.port
+
+    def requestGet(self, path):
+        return requests.get(self.pathPrefix + path)
+
+    def requestPost(self, path, data):
+        headers = {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache'
+        }
+        return requests.post(self.pathPrefix + path, data=data, headers=headers)
+
+    def notify(self, address):
+        return requestPost('/resource-mapper/topology/bbu-migration?address=' + address)
+
 class LogCollector():
     CAPACITY = 1000
 
     def __init__(self):
         self.history = []
+        self.watchlist = []
+        self.RMAPI = RMAPI()
 
     def findLastSeen(self, timestamp):
         index = 0
@@ -14,9 +38,17 @@ class LogCollector():
 
     def append(self, entry):
         self.history.insert(0, entry)
+        for bbu in self.watchlist:
+            if (bbu == entry.source):
+                self.RMAPI.notify(entry.address)
+                self.watchlist.remove(bbu)
+
         if (len(self.history) > LogCollector.CAPACITY):
             self.history.pop()
         return entry
 
     def peek(self, timestamp = 0):
         return self.history[0:self.findLastSeen(timestamp)]
+
+    def watch(self, name):
+        self.watchlist.append(name)

@@ -22,3 +22,7 @@ class LCServer():
     @log_collector.route("/append", methods=['POST'])
     def append():
         return jsonify(LCServer.ref.append(request.json))
+
+    @log_collector.route("/watch", methods=['POST'])
+    def watch():
+        return jsonify(LCServer.ref.watch(request.args.get('name')))
