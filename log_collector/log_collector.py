@@ -38,10 +38,10 @@ class LogCollector():
 
     def append(self, entry):
         self.history.insert(0, entry)
-        for bbu in self.watchlist:
-            if (bbu == entry.source):
+        for bbuAddress in self.watchlist:
+            if (bbuAddress == entry.address):
                 self.RMAPI.notify(entry.address)
-                self.watchlist.remove(bbu)
+                self.watchlist.remove(bbuAddress)
 
         if (len(self.history) > LogCollector.CAPACITY):
             self.history.pop()
@@ -50,5 +50,5 @@ class LogCollector():
     def peek(self, timestamp = 0):
         return self.history[0:self.findLastSeen(timestamp)]
 
-    def watch(self, name):
-        self.watchlist.append(name)
+    def watch(self, address):
+        self.watchlist.append(address)
