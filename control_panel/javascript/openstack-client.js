@@ -104,7 +104,7 @@ Vue.component('hypervisor', {
         console.log(`migrating the instance ${instanceName} to ${targetHypervisor}`);
         axios.post(`${OCServerURL}/instance/${instanceName}/migrate?target=${targetHypervisor}`)
           .then((response) => {
-            return axios.post(`${RMServerURL}/topology/bbu-migration?address=${instanceAddr}`);
+            return axios.post(`${LCServerURL}/watch?address=${instanceAddr}`);
           }).then((response) => {
             this.$emit('change');
           }).catch(function(error){
