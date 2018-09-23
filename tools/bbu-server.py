@@ -4,10 +4,12 @@ import time
 import argparse
 import json
 import urllib.request
+import subprocess
 from threading import Timer
 
 UDP_LISTEN_PORT = 3000
 REPORT_INTERVAL = 10.0
+IP_ADDRESS = subprocess.check_output(['hostname', '-I']).decode().split(' ')[0]
 
 parser = argparse.ArgumentParser()
 parser.add_argument('name')
@@ -26,6 +28,7 @@ def report():
         memoryUtilization = round(float(used)/total, 2) * 100
         payload = {
             'source': args.name,
+            'address': IP_ADDRESS,
             'timestamp': int(time.time()),
             'packetCount': packetCount,
             'cpuUtilization': cpuUtilization,

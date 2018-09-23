@@ -1,3 +1,4 @@
+import subprocess
 import os
 import time
 import argparse
@@ -6,6 +7,7 @@ import urllib.request
 from threading import Timer
 
 REPORT_INTERVAL = 10.0
+IP_ADDRESS = subprocess.check_output(['hostname', '-I']).decode().split(' ')[0]
 
 parser = argparse.ArgumentParser()
 parser.add_argument('name')
@@ -21,6 +23,7 @@ def report():
         memoryUtilization = round(float(used)/total, 2) * 100
         payload = {
             'source': args.name,
+            'address': IP_ADDRESS,
             'timestamp': int(time.time()),
             'cpuUtilization': cpuUtilization,
             'memoryUtilization': memoryUtilization
