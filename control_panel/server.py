@@ -1,4 +1,5 @@
 import requests
+import json
 from flask import Flask, Blueprint, Response, stream_with_context, request
 
 from .config import *
@@ -40,5 +41,8 @@ class CPServer():
         if (request.method == 'GET'):
             req = requests.get(LC_SERVICE_URL + '/log-collector/' + url, stream=True, params=request.args)
         else:
-            req = requests.post(LC_SERVICE_URL + '/log-collector/' + url, stream=True, params=request.args)
+            if (request.json is None):
+                req = requests.post(LC_SERVICE_URL + '/log-collector/' + url, stream=True, params=requests.args)
+            else:
+                req = requests.post(LC_SERVICE_URL + '/log-collector/' + url, stream=True, headers={'Content-Type': 'application/json'}, data=json.dumps(request.json))
         return Response(stream_with_context(req.iter_content()), content_type=req.headers['content-type'])
