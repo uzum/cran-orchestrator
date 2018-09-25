@@ -1,4 +1,5 @@
 import socket
+from .config import *
 
 class Switch():
     def __init__(self, id):
