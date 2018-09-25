@@ -26,11 +26,10 @@ def getAddressDetails(address):
 # returns a userdata string for the instance to be created
 def prepareUserdata(name):
     with open(os.path.join(os.path.dirname(__file__), '../tools/bbu-server.py'), 'r') as bbuScript:
-        return '''#cloud-boothook
-#!/bin/bash
+        return '''#!/bin/bash
 echo "{code}" > server.py
 nohup python3 server.py {name} {address} > server.out &
-        '''.format(code = bbuScript.read(), name = name, address = LOG_COLLECTOR_ADDRESS)
+        '''.format(code = bbuScript.read().replace('$', '\$'), name = name, address = LOG_COLLECTOR_ADDRESS)
 
 # returns a simplifed representation of an instance
 def getInstanceDetails(instance):
