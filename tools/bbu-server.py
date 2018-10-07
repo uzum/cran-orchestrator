@@ -1,3 +1,8 @@
+
+# in order to run the code : 
+# python3 bbu-server.py bbu-name x
+
+
 import socket
 import os
 import time
@@ -7,7 +12,8 @@ import urllib.request
 import subprocess
 from threading import Timer
 
-UDP_LISTEN_PORT = 3000
+# bu port 3000 orjinalinde, 3001 yapcez
+UDP_LISTEN_PORT = 3001
 REPORT_INTERVAL = 10.0
 IP_ADDRESS = subprocess.check_output(['hostname', '-I']).decode().split(' ')[0]
 
@@ -43,10 +49,14 @@ def report():
     timer.start()
 
 print('listening to ' + str(UDP_LISTEN_PORT))
-report()
+# asagiyi log collector istemedigin icin calistirmiyorsun 
+#report()
 
 while True:
     (message, address) = server_socket.recvfrom(1024)
     packetCount += 1
     print('received message from ' + str(address))
+    # Burda arkada caliscak CPU & memory allocation sciptini calistirman lazim
+    # background process olarak calistirman onemli cunku bu kodun devam etmesi lazim 
+    # message json parse ile parse edilcek ve cpu demand ve memory demand olculecek.
     print(message.decode('utf-8'))

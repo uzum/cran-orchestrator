@@ -2,6 +2,7 @@ import math
 import random
 from .udp_connection import UDPConnection
 
+
 class RRH():
     nextId = -1
 
@@ -16,8 +17,11 @@ class RRH():
         self.connections = []
         self.state = 'stopped'
         self.arrivalRate = options['arrivalRate']
+
+        
         self.addConnection(options['connectionNumber'])
 
+  
     def addConnection(self, amount=1):
         for idx in range(amount):
             connection = UDPConnection({
@@ -25,7 +29,10 @@ class RRH():
                 'dstIP': self.dstIP,
                 'dstPort': self.dstPort,
                 'arrivalRate': self.arrivalRate
-            })
+                #'cpuDemand': self.cpuDemand,
+                #'memoryDemand': self.memoryDemand,
+                #'packetSize': self.packetSize
+            })  
             self.connections.append(connection)
             if (self.state == 'running'):
                 connection.start()
