@@ -1,6 +1,7 @@
 import socket
 import json
 import math
+import time
 import random
 from threading import Timer
 
@@ -52,7 +53,8 @@ class UDPConnection():
     def createPayload(self):
         return json.dumps({
             'name': self.name,
-            'seq': self.sequenceNumber
+            'seq': self.sequenceNumber,
+            'timestamp': int(time.time())
         }) + "\n"
 
     def toObject(self):
