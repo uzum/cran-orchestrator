@@ -28,8 +28,8 @@ def prepareUserdata(name):
     with open(os.path.join(os.path.dirname(__file__), '../tools/bbu-server.py'), 'r') as bbuScript:
         return '''#!/bin/bash
 echo "{code}" > server.py
-nohup python3 server.py {name} {address} > server.out &
-        '''.format(code = bbuScript.read().replace('$', '\$'), name = name, address = LOG_COLLECTOR_ADDRESS)
+nohup python3 server.py {name} {address} {interface} > server.out &
+        '''.format(code = bbuScript.read().replace('$', '\$'), name = name, address = LOG_COLLECTOR_ADDRESS, interface = "ens3")
 
 # returns a simplifed representation of an instance
 def getInstanceDetails(instance):
