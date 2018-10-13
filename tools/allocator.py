@@ -5,7 +5,6 @@ class Allocator():
 		self.memory = 1
 		#self.cpu = payload['cpuDemand']
 		self.cpu = 1
-		# burda packet size ise yaramicak sanirim
 		self.packetSize = payload['packetSize']
 		self.data = payload['data']
 		self.dummy = bytearray(1)
@@ -22,6 +21,5 @@ class Allocator():
 		self.memory_release()
 
 	def start(self):
-		#print('Allocation Process Started')
 		self.cpu_allocate()
-		#print('Allocation Completed')
+

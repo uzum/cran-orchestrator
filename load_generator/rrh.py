@@ -29,9 +29,6 @@ class RRH():
                 'dstIP': self.dstIP,
                 'dstPort': self.dstPort,
                 'arrivalRate': self.arrivalRate
-                #'cpuDemand': self.cpuDemand,
-                #'memoryDemand': self.memoryDemand,
-                #'packetSize': self.packetSize
             })  
             self.connections.append(connection)
             if (self.state == 'running'):
