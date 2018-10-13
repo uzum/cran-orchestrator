@@ -3,4 +3,4 @@ CONNECTION_NUMBER = 1
 POISSON_RATE = 1/4.0
 BASE_PORT = 3000
 LG_SERVICE_PORT = 5001
-BROADCAST_ADDRESS = '192.168.1.5' # udp paketlerinin hangi ip'ye yollanacagi, localde 127
+BROADCAST_ADDRESS = '192.168.1.100' # udp paketlerinin hangi ip'ye yollanacagi, localde 127

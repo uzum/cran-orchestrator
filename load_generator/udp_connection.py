@@ -61,20 +61,23 @@ class UDPConnection():
             self.nextPacketScheduler = None
 
     def createPayload(self):
+        
         return json.dumps({
             'name': self.name,
             'seq': self.sequenceNumber,
             # burda yeni fieldleri kullanarak cpu demand , packet size ve memory demand 3 farkli field doldurman lazim.
-            'cpuDemand': self.cpuDemand,
-            'memoryDemand': self.memoryDemand,
-            'packetSize': self.packetSize
+            #'cpuDemand': self.cpuDemand,
+            #'memoryDemand': self.memoryDemand,
+            'packetSize': self.packetSize,
+            'data' : 'a'*(self.packetSize - 49)
+            # need to send char in order to serialize with json 
 
         }) + "\n"
 
     def setDemandAndSize(self):
-        self.cpuDemand = self.getGaussianRandom(mean = 10000, dev = 3000)
-        self.memoryDemand = self.getGaussianRandom(mean = 100000, dev = 30000)
-        self.packetSize = self.getGaussianRandom(mean = 1000, dev = 200, max_limit = 1024)
+        #self.cpuDemand = self.getGaussianRandom(mean = 10000, dev = 3000)
+        #self.memoryDemand = self.getGaussianRandom(mean = 100000, dev = 30000)
+        self.packetSize = self.getGaussianRandom(mean = 800, dev = 200, max_limit = 1000)
     def getGaussianRandom(self, mean, dev, max_limit = None, min_limit = 0):
         # returns number of cycles in terms of kHz 
         if max_limit == None:
@@ -86,7 +89,7 @@ class UDPConnection():
         return {
             'name': self.name,
             'sequenceNumber': self.sequenceNumber,
-            'cpuDemand': self.cpuDemand,
-            'memoryDemand': self.memoryDemand,
+            #'cpuDemand': self.cpuDemand,
+            #'memoryDemand': self.memoryDemand,
             'packetSize': self.packetSize
         }
