@@ -14,6 +14,8 @@ class UDPConnection():
         self.dstIP = options['dstIP']
         self.dstPort = options['dstPort']
         self.arrivalRate = options['arrivalRate']
+        self.packetSizeMean = options['packetSizeMean']
+        self.packetSizeDev = options['packetSizeDev']
         self.sequenceNumber = 0
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.nextPacketScheduler = None
@@ -29,6 +31,9 @@ class UDPConnection():
         print('sending to ' + str(self.dstIP) + ':' + str(self.dstPort) + ' from ' + self.name)
         self.socket.sendto(bytes(message, 'UTF-8'), (self.dstIP, self.dstPort))
         self.sequenceNumber = self.sequenceNumber + 1
+
+    def setParameter(self, param, value):
+        setattr(self, param, value)
 
     def setArrivalRate(self, rate):
         self.arrivalRate = rate;
