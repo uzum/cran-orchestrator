@@ -40,6 +40,10 @@ class LGServer():
     def setArrivalRate(id):
         return jsonify(LGServer.ref.setArrivalRate(int(id), float(request.args.get('rate'))))
 
+    @load_generator.route("/rrh/<id>/set-parameter/<param>", methods=['POST'])
+    def setParameter(id, param):
+        return jsonify(LGServer.ref.setParameter(int(id), param, float(request.args.get('value'))))
+
     @load_generator.route("/rrh/<id>/add-connection", methods=['POST'])
     def addConnection(id):
         return jsonify(LGServer.ref.addConnection(int(id), int(request.args.get('amount'))))

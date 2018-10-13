@@ -1,6 +1,7 @@
 import socket
 import json
 import math
+import time
 import random
 from threading import Timer
 import numpy as np
@@ -15,6 +16,8 @@ class UDPConnection():
         self.dstIP = options['dstIP']
         self.dstPort = options['dstPort']
         self.arrivalRate = options['arrivalRate']
+        self.packetSizeMean = options['packetSizeMean']
+        self.packetSizeDev = options['packetSizeDev']
         self.sequenceNumber = 0
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.nextPacketScheduler = None
@@ -33,7 +36,10 @@ class UDPConnection():
         self.socket.sendto(bytes(message, 'UTF-8'), (self.dstIP, self.dstPort))
         self.sequenceNumber = self.sequenceNumber + 1
         self.setPacketSize()
-    
+
+    def setParameter(self, param, value):
+        setattr(self, param, value)
+
     def setArrivalRate(self, rate):
         self.arrivalRate = rate;
         if (self.nextPacketScheduler is not None):
@@ -55,24 +61,27 @@ class UDPConnection():
             self.nextPacketScheduler = None
 
     def createPayload(self):
-        
+
         return json.dumps({
             'name': self.name,
             'seq': self.sequenceNumber,
             'packetSize': self.packetSize,
             'data' : self.data # The reason we use -49 is to compansate string length with the desired packet size in terms of bytes.
+            'timestamp': int(time.time())
         }) + "\n"
 
     def setPacketSize(self):
-        self.packetSize = self.getGaussianRandom(mean = 800, dev = 200, max_limit = 1000)
+        self.packetSize = self.getGaussianRandom(mean = self.packetSizeMean, dev = self.packetSizeDev, max_limit = PACKET_SIZE_MAX)
         self.data = 'a'*(self.packetSize - 49)
+
     def getGaussianRandom(self, mean, dev, max_limit = None, min_limit = 0):
-        # returns number of cycles in terms of kHz 
+        # returns number of cycles in terms of kHz
         if max_limit == None:
             return int (np.random.normal(mean,dev,1))
         else:
             return int( stats.truncnorm(
                 (min_limit - mean) / dev, (max_limit - mean) / dev, loc = mean, scale = dev ).rvs(1) )
+
     def toObject(self):
         return {
             'name': self.name,

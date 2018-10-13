@@ -9,7 +9,8 @@ class LoadGenerator():
         LoadGenerator.nextId += 1
         return LoadGenerator.nextId
 
-    def __init__(self, rrhNumber=RRH_NUMBER, connectionNumber=CONNECTION_NUMBER, arrivalRate=POISSON_RATE):
+    def __init__(self, rrhNumber=RRH_NUMBER, connectionNumber=CONNECTION_NUMBER,
+                 arrivalRate=POISSON_RATE, packetSizeMean=PACKET_SIZE_MEAN, packetSizeDev=PACKET_SIZE_DEV):
         self.rrhs = []
         for idx in range(rrhNumber):
             id = LoadGenerator.getNextId()
@@ -18,7 +19,9 @@ class LoadGenerator():
                 'dstPort': BASE_PORT + id + 1,
                 'dstIP': BROADCAST_ADDRESS,
                 'connectionNumber': connectionNumber,
-                'arrivalRate': arrivalRate
+                'arrivalRate': arrivalRate,
+                'packetSizeMean': packetSizeMean,
+                'packetSizeDev': packetSizeDev
             }))
 
     def removeRRH(self, rrhId):
@@ -28,14 +31,16 @@ class LoadGenerator():
                 rrh.destroy()
         self.rrhs = [rrh for rrh in self.rrhs if rrh.id != rrhId]
 
-    def addRRH(self, arrivalRate=POISSON_RATE):
+    def addRRH(self, arrivalRate=POISSON_RATE, packetSizeMean=PACKET_SIZE_MEAN, packetSizeDev=PACKET_SIZE_DEV):
         id = LoadGenerator.getNextId()
         rrh = RRH({
             'id': id,
             'dstPort': BASE_PORT + id + 1,
             'dstIP': BROADCAST_ADDRESS,
             'connectionNumber': 0,
-            'arrivalRate': arrivalRate
+            'arrivalRate': arrivalRate,
+            'packetSizeMean': packetSizeMean,
+            'packetSizeDev': packetSizeDev
         })
         self.rrhs.append(rrh)
         return rrh.toObject()
@@ -56,6 +61,12 @@ class LoadGenerator():
         for rrh in self.rrhs:
             if (rrh.id == rrhId):
                 rrh.setArrivalRate(rate)
+                return rrh.toObject()
+
+    def setParameter(self, rrhId, param, value):
+        for rrh in self.rrhs:
+            if (rrh.id == rrhId):
+                rrh.setParameter(param, value)
                 return rrh.toObject()
 
     def addConnection(self, rrhId, amount):

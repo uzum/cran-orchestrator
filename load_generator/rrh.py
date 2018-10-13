@@ -17,19 +17,21 @@ class RRH():
         self.connections = []
         self.state = 'stopped'
         self.arrivalRate = options['arrivalRate']
-
-        
+        self.packetSizeMean = options['packetSizeMean']
+        self.packetSizeDev = options['packetSizeDev']
         self.addConnection(options['connectionNumber'])
 
-  
+
     def addConnection(self, amount=1):
         for idx in range(amount):
             connection = UDPConnection({
                 'name': 'rrh#' + str(self.id) + 'connection#' + str(RRH.getNextId()),
                 'dstIP': self.dstIP,
                 'dstPort': self.dstPort,
-                'arrivalRate': self.arrivalRate
-            })  
+                'arrivalRate': self.arrivalRate,
+                'packetSizeMean': self.packetSizeMean
+                'packetSizeDev': self.packetSizeDev
+            })
             self.connections.append(connection)
             if (self.state == 'running'):
                 connection.start()
@@ -38,6 +40,11 @@ class RRH():
         for idx in range(amount):
             connection = self.connections.pop()
             connection.close()
+
+    def setParameter(self, param, value):
+        setattr(self, param, value)
+        for connection in self.connections:
+            connection.setParameter(param, value)
 
     def setArrivalRate(self, rate):
         self.arrivalRate = rate
@@ -63,6 +70,8 @@ class RRH():
            'id': self.id,
            'dstPort': self.dstPort,
            'arrivalRate': self.arrivalRate,
+           'packetSizeMean': self.packetSizeMean,
+           'packetSizeDev': self.packetSizeDev,
            'connections': [connection.toObject() for connection in self.connections],
            'state': self.state
        }

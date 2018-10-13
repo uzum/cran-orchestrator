@@ -73,8 +73,9 @@ while True:
         localStats['packetCount'] += 1
         # calculate how much time has passed since the packet was created in load generator
         localStats['totalLatency'] += (timestamp - payload['timestamp'])
-        allocator = Allocator(payload)
-        allocator.start()
+        # no need to use allocator for now
+        # allocator = Allocator(payload)
+        # allocator.start()
     except Exception as err:
         print('failed to process UDP packet')
         print(err)

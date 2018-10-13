@@ -4,17 +4,20 @@ import time
 import argparse
 import json
 import urllib.request
+from nwstats import NetworkStats
 from threading import Timer
 
-REPORT_INTERVAL = 10.0
+REPORT_INTERVAL = 2.0
 IP_ADDRESS = subprocess.check_output(['hostname', '-I']).decode().split(' ')[0]
 
 parser = argparse.ArgumentParser()
 parser.add_argument('name')
 parser.add_argument('address')
+parser.add_argument('interface')
 args = parser.parse_args()
 
 timer = None
+nwStats = NetworkStats(args.interface)
 
 def report():
     try:
@@ -28,6 +31,7 @@ def report():
             'cpuUtilization': cpuUtilization,
             'memoryUtilization': memoryUtilization
         }
+        payload.update(nwStats.collect())
         request = urllib.request.Request(args.address, json.dumps(payload).encode('utf-8'), { 'Content-Type': 'application/json' })
         response = urllib.request.urlopen(request)
     except Exception as err:
