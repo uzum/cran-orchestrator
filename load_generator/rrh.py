@@ -2,6 +2,7 @@ import math
 import random
 from .udp_connection import UDPConnection
 
+
 class RRH():
     nextId = -1
 
@@ -19,6 +20,7 @@ class RRH():
         self.packetSizeMean = options['packetSizeMean']
         self.packetSizeDev = options['packetSizeDev']
         self.addConnection(options['connectionNumber'])
+
 
     def addConnection(self, amount=1):
         for idx in range(amount):

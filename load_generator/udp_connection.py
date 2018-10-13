@@ -4,6 +4,8 @@ import math
 import time
 import random
 from threading import Timer
+import numpy as np
+import scipy.stats as stats
 
 def nextTime(rate):
     return -math.log(1.0 - random.random()) / rate
@@ -19,6 +21,8 @@ class UDPConnection():
         self.sequenceNumber = 0
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.nextPacketScheduler = None
+        self.setPacketSize()
+
 
     def sendPacket(self):
         self.send(self.createPayload())
@@ -31,6 +35,7 @@ class UDPConnection():
         print('sending to ' + str(self.dstIP) + ':' + str(self.dstPort) + ' from ' + self.name)
         self.socket.sendto(bytes(message, 'UTF-8'), (self.dstIP, self.dstPort))
         self.sequenceNumber = self.sequenceNumber + 1
+        self.setPacketSize()
 
     def setParameter(self, param, value):
         setattr(self, param, value)
@@ -56,14 +61,31 @@ class UDPConnection():
             self.nextPacketScheduler = None
 
     def createPayload(self):
+
         return json.dumps({
             'name': self.name,
             'seq': self.sequenceNumber,
+            'packetSize': self.packetSize,
+            'data' : self.data # The reason we use -49 is to compansate string length with the desired packet size in terms of bytes.
             'timestamp': int(time.time())
         }) + "\n"
+
+    def setPacketSize(self):
+        self.packetSize = self.getGaussianRandom(mean = self.packetSizeMean, dev = self.packetSizeDev, max_limit = PACKET_SIZE_MAX)
+        self.data = 'a'*(self.packetSize - 49)
+
+    def getGaussianRandom(self, mean, dev, max_limit = None, min_limit = 0):
+        # returns number of cycles in terms of kHz
+        if max_limit == None:
+            return int (np.random.normal(mean,dev,1))
+        else:
+            return int( stats.truncnorm(
+                (min_limit - mean) / dev, (max_limit - mean) / dev, loc = mean, scale = dev ).rvs(1) )
 
     def toObject(self):
         return {
             'name': self.name,
-            'sequenceNumber': self.sequenceNumber
+            'sequenceNumber': self.sequenceNumber,
+            'packetSize': self.packetSize,
+            'data': self.data
         }

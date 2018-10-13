@@ -7,7 +7,7 @@ import urllib.request
 import subprocess
 from threading import Timer
 from nwstats import NetworkStats
-
+from allocator import Allocator
 UDP_LISTEN_PORT = 3000
 REPORT_INTERVAL = 2.0
 IP_ADDRESS = subprocess.check_output(['hostname', '-I']).decode().split(' ')[0]
@@ -73,6 +73,9 @@ while True:
         localStats['packetCount'] += 1
         # calculate how much time has passed since the packet was created in load generator
         localStats['totalLatency'] += (timestamp - payload['timestamp'])
+        # no need to use allocator for now
+        # allocator = Allocator(payload)
+        # allocator.start()
     except Exception as err:
         print('failed to process UDP packet')
         print(err)
