@@ -65,6 +65,22 @@ Vue.component('remote-radio-head', {
               </div>
             </div>
           </p>
+            <b>Packet size mean: </b>
+            <div class="input-group">
+              <input class="form-control" type="text" v-model="rrh.packetSizeMean" />
+              <div class="input-group-append">
+                <button class="btn btn-primary" type="button" v-on:click="setDistributionParameter('packetSizeMean')">Set</button>
+              </div>
+            </div>
+          </p>
+            <b>Packet size dev.: </b>
+            <div class="input-group">
+              <input class="form-control" type="text" v-model="rrh.packetSizeDev" />
+              <div class="input-group-append">
+                <button class="btn btn-primary" type="button" v-on:click="setDistributionParameter('packetSizeDev')">Set</button>
+              </div>
+            </div>
+          </p>
         </div>
         <div class="card-footer">
           <div v-for="connection in rrh.connections">
@@ -117,6 +133,15 @@ Vue.component('remote-radio-head', {
           console.log(error);
         });
     },
+    setDistributionParameter: function(param){
+      axios.post(`${LGServerURL}/rrh/${this.rrh.id}/set-parameter/${param}?value=${this.rrh[param]}`)
+        .then((response) => {
+          this.$emit('change');
+        })
+        .catch(function(error){
+          console.log(error);
+        });
+    },
     start: function(){
       axios.post(`${LGServerURL}/rrh/${this.rrh.id}/start`)
         .then((response) => {
@@ -144,7 +169,9 @@ const LG = new Vue({
     return {
       rrhs: [],
       newRrh: {
-        arrivalRate: 0
+        arrivalRate: 0,
+        packetSizeMean: 0,
+        packetSizeDev: 0
       }
     };
   },
