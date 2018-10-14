@@ -29,7 +29,7 @@ class RRH():
                 'dstIP': self.dstIP,
                 'dstPort': self.dstPort,
                 'arrivalRate': self.arrivalRate,
-                'packetSizeMean': self.packetSizeMean
+                'packetSizeMean': self.packetSizeMean,
                 'packetSizeDev': self.packetSizeDev
             })
             self.connections.append(connection)
