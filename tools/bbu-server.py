@@ -21,6 +21,7 @@ args = parser.parse_args()
 timer = None
 nwStats = NetworkStats(args.interface)
 localStats = {
+    'packetBytes': 0,
     'packetCount': 0,
     'totalLatency': 0
 }
@@ -37,6 +38,7 @@ def report():
             'address': IP_ADDRESS,
             'timestamp': int(time.time()),
             'packetPerSecond': localStats['packetCount'] / REPORT_INTERVAL,
+            'bytePerSecond': localStats['packetBytes'] / REPORT_INTERVAL,
             'cpuUtilization': cpuUtilization,
             'memoryUtilization': memoryUtilization
         }
@@ -58,6 +60,7 @@ def report():
     timer.start()
     # restart packet count and latency calculations before next iteration
     localStats['packetCount'] = 0
+    localStats['packetBytes'] = 0
     localStats['totalLatency'] = 0
 
 print('listening to ' + str(UDP_LISTEN_PORT))
@@ -71,6 +74,7 @@ while True:
     try:
         payload = json.loads(message.decode('utf-8'))
         localStats['packetCount'] += 1
+        localStats['packetBytes'] += len(message)
         # calculate how much time has passed since the packet was created in load generator
         localStats['totalLatency'] += (timestamp - payload['timestamp'])
         # no need to use allocator for now
