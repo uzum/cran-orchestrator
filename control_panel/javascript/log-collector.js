@@ -57,24 +57,41 @@ Vue.component('history-entry', {
 
 Vue.component('log-history', {
   props: ['history'],
+  data: function(){
+    return {
+      query: ''
+    };
+  },
   template: `
     <div class="history-container">
+      <div class="row">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Filter by ..." v-model="query">
+        </div>
+      </div>
       <div class="row">
         <div class="col-md-2"><b>Timestamp</b></div>
         <div class="col-md-2"><b>Source</b></div>
         <div class="col-md-2"><b>Payload</b></div>
       </div>
       <history-entry
-        v-for="entry in history"
+        v-for="entry in filteredHistory"
         v-bind:key="entry.timestamp + entry.source"
         v-bind:entry="entry"
       />
     </div>
-  `
+  `,
+  computed: {
+    filteredHistory: function(){
+      return this.history
+        .filter(entry => entry.source.includes(this.query))
+        .sort((a, b) => b.timestamp - a.timestamp);
+    }
+  }
 });
 
-const HISTORY_CAPACITY = 10;
-const PEEK_INTERVAL = 3000;
+const HISTORY_CAPACITY = 20;
+const PEEK_INTERVAL = 1000;
 
 const LC = new Vue({
   el: '#lc-vue-app',
