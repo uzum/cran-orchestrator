@@ -3,9 +3,60 @@ import os
 import time
 import argparse
 import json
-import urllib.request
-from nwstats import NetworkStats
 from threading import Timer
+import urllib.request
+
+class NetworkStats():
+    def __init__(self):
+        self.stats = {
+            'timestamp': 0,
+            'rx_bytes': 0,
+            'tx_bytes': 0,
+            'rx_packets': 0,
+            'tx_packets': 0,
+            'rx_dropped': 0,
+            'tx_dropped': 0,
+            'rx_errors': 0,
+            'tx_errors': 0
+        }
+
+    def getInterfaces(self):
+        return [iface for iface in os.listdir('/sys/class/net') if iface.startswith('tap')]
+
+    def getStat(self, filename):
+        sum = 0
+        for iface in self.getInterfaces():
+            with open('/sys/class/net/' + iface + '/statistics/' + filename, 'r') as f:
+                sum += int(f.read())
+        return sum
+
+    def collect(self):
+        # calculate duration and update timestamp
+        timestamp = int(time.time())
+        duration = timestamp - self.stats['timestamp']
+        self.stats['timestamp'] = timestamp
+
+        stats = {}
+        # byte and packet stats, calculate by report interval time
+        for stat in ['bytes', 'packets']:
+            for rxtx in ['rx', 'tx']:
+                key = rxtx + '_' + stat
+                currentValue = self.getStat(key)
+                stats[key] = (currentValue - self.stats[key]) / duration
+                self.stats[key] = currentValue
+
+        # error and drop rate stats, calculate by number of packets
+        for stat in ['dropped', 'errors']:
+            for rxtx in ['rx', 'tx']:
+                key = rxtx + '_' + stat
+                # if there were no packets during this interval, rates are 0
+                if stats[rxtx + '_packets'] == 0:
+                    stats[key] = 0
+                else:
+                    currentValue = self.getStat(key)
+                    stats[key] = (currentValue - self.stats[key]) / stats[rxtx + '_packets']
+                    self.stats[key] = currentValue
+        return stats
 
 REPORT_INTERVAL = 2.0
 IP_ADDRESS = subprocess.check_output(['hostname', '-I']).decode().split(' ')[0]
@@ -13,11 +64,10 @@ IP_ADDRESS = subprocess.check_output(['hostname', '-I']).decode().split(' ')[0]
 parser = argparse.ArgumentParser()
 parser.add_argument('name')
 parser.add_argument('address')
-parser.add_argument('interface')
 args = parser.parse_args()
 
 timer = None
-nwStats = NetworkStats(args.interface)
+nwStats = NetworkStats()
 
 def report():
     try:
