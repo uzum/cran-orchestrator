@@ -50,6 +50,11 @@ class RMServer():
         RMServer.ref.onBBUMigration(request.args.get('address'))
         return jsonify({ 'success': True })
 
+    @resource_mapper.route("/topology/bbu-creation", methods=['POST'])
+    def onBBUMigration():
+        RMServer.ref.onBBUCreation(request.args.get('address'))
+        return jsonify({ 'success': True })
+
     @resource_mapper.route("/topology/set-controller", methods=['POST'])
     def setControllerNodeSwitch():
         RMServer.ref.setControllerNodeSwitch(request.args.get('id'))

@@ -239,12 +239,26 @@ class ResourceMapper():
         self.addMappingRules(mapping)
 
     def onBBUMigration(self, address):
-        bbuId = self.topology.getHostIdByIP(address)
+        previousId = self.topology.getHostIdByIP(address)
         self.topology.discover(self.ODLAPI.topology())
+        newId = self.topology.getHostIdByIP(address)
+
+        if (newId == None):
+            print('could not find the migrated instance address in ODL topology')
+            return
+
+        if (newId == previousId):
+            print('host id did not change for bbu at ' + address + ' after migration')
+            # no need to return here but something is probably wrong
 
         for mapping in self.mappings:
-            if bbuId in mapping.bbuList:
+            if previousId in mapping.bbuList:
+                # update the bbu id in the mapping list and re-create openflow flows&groups
+                mapping.bbuList = [newId if bbuId == previousId else bbuId for bbuId in mapping.bbuList]
                 self.updateMapping(mapping)
+
+    def onBBUCreation(self, address):
+        self.topology.discover(self.ODLAPI.topology())
 
     def addForwardingFlow(self, switch, filters, instructions, options):
         print('Creating a forwarding flow in ' + switch.id)

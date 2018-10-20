@@ -117,3 +117,4 @@ class Topology():
             for host in switch.hosts:
                 if (host.ip == ip):
                     return host.id
+        return None
