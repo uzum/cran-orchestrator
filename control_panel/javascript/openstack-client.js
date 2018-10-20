@@ -32,12 +32,7 @@ Vue.component('instance', {
       this.$emit('delete', this.instance.name);
     },
     migrate: function(){
-      const privateAddress = this.instance.addresses.find(address => address.addr.startsWith('10.0'));
-      if (!privateAddress) {
-        console.log('the instance does not have a private address');
-      } else {
-        this.$emit('migrate', this.instance.name, privateAddress.addr, this.targetHypervisor);
-      }
+      this.$emit('migrate', this.instance.name, this.targetHypervisor);
     }
   }
 })
@@ -90,21 +85,22 @@ Vue.component('hypervisor', {
     createInstance: function(){
       axios.post(`${OCServerURL}/instance?name=${this.hypervisor.newInstance.name}&zone=${this.hypervisor.hostname}`)
         .then((response) => {
+          return axios.post(`${LCServerURL}/watch?list=creation&name=${this.hypervisor.newInstance.name}`);
+        }).then((response) => {
           this.$emit('change');
-        })
-        .catch(function(error){
+        }).catch(function(error){
           console.log(error);
         });
     },
     update: function(){
       this.$emit('change');
     },
-    migrateInstance: function(instanceName, instanceAddr, targetHypervisor){
+    migrateInstance: function(instanceName, targetHypervisor){
       if (targetHypervisor !== this.hypervisor.hostname) {
         console.log(`migrating the instance ${instanceName} to ${targetHypervisor}`);
         axios.post(`${OCServerURL}/instance/${instanceName}/migrate?target=${targetHypervisor}`)
           .then((response) => {
-            return axios.post(`${LCServerURL}/watch?list=migration&address=${instanceAddr}`);
+            return axios.post(`${LCServerURL}/watch?list=migration&name=${instanceName}`);
           }).then((response) => {
             this.$emit('change');
           }).catch(function(error){

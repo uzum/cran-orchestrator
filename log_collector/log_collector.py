@@ -44,15 +44,15 @@ class LogCollector():
 
     def append(self, entry):
         self.history.insert(0, entry)
-        for bbuAddress in self.watchlist['migration']:
-            if (bbuAddress == entry.address):
+        for bbuName in self.watchlist['migration']:
+            if (bbuName == entry.source):
                 self.RMAPI.notifyMigration(entry.address)
-                self.watchlist['migration'].remove(bbuAddress)
+                self.watchlist['migration'].remove(bbuName)
 
-        for bbuAddress in self.watchlist['creation']:
-            if (bbuAddress == entry.address):
+        for bbuName in self.watchlist['creation']:
+            if (bbuName == entry.source):
                 self.RMAPI.notifyCreation(entry.address)
-                self.watchlist['creation'].remove(bbuAddress)
+                self.watchlist['creation'].remove(bbuName)
 
         if (len(self.history) > LogCollector.CAPACITY):
             self.history.pop()
@@ -61,5 +61,5 @@ class LogCollector():
     def peek(self, timestamp = 0):
         return self.history[0:self.findLastSeen(timestamp)]
 
-    def watch(self, list, address):
-        self.watchlist[list].append(address)
+    def watch(self, list, name):
+        self.watchlist[list].append(name)
