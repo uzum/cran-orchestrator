@@ -20,8 +20,8 @@ class Mapping():
             'id': self.id,
             'rrh': self.rrhId,
             'bbus': self.bbuList,
-            'flows': [flow.xml() for flow in self.flows],
-            'groups': [group.xml() for group in self.groups]
+            'flows': [flow.xml(pretty=True) for flow in self.flows],
+            'groups': [group.xml(pretty=True) for group in self.groups]
         }
 
 class ResourceMapper():

@@ -101,7 +101,7 @@ class Flow():
         self.id = Flow.nextFlowId
         Flow.nextFlowId = Flow.nextFlowId + 1
 
-    def xml(self):
+    def xml(self, pretty=False):
         return tostring(E.input(
             E.barrier('false'),
             getTargetSwitch(self.options.get('switch')),
@@ -116,4 +116,4 @@ class Flow():
             E.strict('false'),
             getattr(E, 'table_id')(self.options.get('table_id')),
             xmlns='urn:opendaylight:flow:service'
-           ), xml_declaration=True, encoding='UTF-8')
+           ), xml_declaration=True, encoding='UTF-8', pretty_print=pretty)
