@@ -7,6 +7,10 @@
           href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
           integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
           crossorigin="anonymous">
+    <link rel="stylesheet"
+          href="https://use.fontawesome.com/releases/v5.4.1/css/all.css"
+          integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz"
+          crossorigin="anonymous">
     <link rel="stylesheet" href="./css/cran-orchestrator.css"></link>
   </head>
   <body>
@@ -14,8 +18,8 @@
       <h1>cran-orchestrator control panel</h1>
       <div class="row">
         <div class="col-md">
-          <h2>load-generator</h2>
           <div id="lg-vue-app">
+            <h2>load-generator</h2>
             <div id="rrh-container" class="row">
               <remote-radio-head
                 v-for="rrh in rrhs"
@@ -23,8 +27,6 @@
                 v-bind:rrh="rrh"
                 v-on:change="update"
               />
-            </div>
-            <div class="row">
               <new-remote-radio-head
                 v-bind:rrh="newRrh"
                 v-on:change="update"
@@ -32,9 +34,14 @@
             </div>
           </div>
         </div>
+      </div>
+      <div class="row">
         <div class="col-md">
-          <h2>resource-mapper</h2>
           <div id="rm-vue-app">
+            <h2 class="clearfix">
+              <span>resource-mapper</span>
+              <a><i class="fas fa-sync-alt float-right" style="cursor: pointer;" v-on:click="refresh"></i></a>
+            </h2>
             <div>
               <topology
                 v-bind:topology="topology"
@@ -51,8 +58,11 @@
           </div>
         </div>
         <div class="col-md">
-          <h2>openstack-client</h2>
           <div id="oc-vue-app">
+            <h2 class="clearfix">
+              <span>openstack-client</span>
+              <a><i class="fas fa-sync-alt float-right" style="cursor: pointer;" v-on:click="update"></i></a>
+            </h2>
             <div id="hypervisor-container" class="row">
               <hypervisor
                 v-for="hypervisor in orderedHypervisors"

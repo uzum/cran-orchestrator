@@ -103,6 +103,10 @@ Vue.component('mapping', {
               </span>
             </div>
           </div>
+          <div class="row">
+            <div class="col-md"><button class="btn btn-outline-secondary" v-on:click="showFlows">Flows</button></div>
+            <div class="col-md"><button class="btn btn-outline-secondary" v-on:click="showGroups">Groups</button></div>
+          </div>
         </div>
         <div class="card-footer">
           <div class="input-group">
@@ -157,6 +161,12 @@ Vue.component('mapping', {
         .catch(function(error){
           console.log(error);
         });
+    },
+    showFlows: function(){
+      console.log(this.rule.flows);
+    },
+    showGroups: function(){
+      console.log(this.rule.groups);
     }
   }
 });
@@ -236,6 +246,12 @@ const RM = new Vue({
     this.updateMapping();
   },
   methods: {
+    refresh: function(){
+      axios.post(`${RMServerURL}/topology/update`).then(() => {
+        this.updateTopology();
+        this.updateMapping();
+      });
+    },
     updateTopology: function(){
       axios.get(`${RMServerURL}/topology`)
         .then((response) => {
