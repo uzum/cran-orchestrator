@@ -122,14 +122,11 @@ class Orchestrator(object):
         return None
 
     def live_migrate_instance(self, instance, host=None):
-        try:
-            # if instance name is given
-            if isinstance(instance, str):
-                instance = self.find_instance(name=instance)
-            return instance.live_migrate(host=host)
-        except Exception as e:
-            print(e)
-        return instance.live_migrate(host=host)
+        # if instance name is given
+        if isinstance(instance, str):
+            instance = self.find_instance(name=instance)
+        instance.live_migrate(host=host)
+        return instance
 
     def get_instance_diagnostics(self, instance):
         if isinstance(instance, str):
