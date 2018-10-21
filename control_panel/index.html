@@ -26,11 +26,11 @@
                 v-bind:key="rrh.id"
                 v-bind:rrh="rrh"
                 v-on:change="update"
-              />
+              ></remote-radio-head>
               <new-remote-radio-head
                 v-bind:rrh="newRrh"
                 v-on:change="update"
-              />
+              ></new-remote-radio-head>
             </div>
           </div>
         </div>
@@ -78,7 +78,7 @@
         <div class="col-md">
           <h2>log-collector</h2>
           <div id="lc-vue-app">
-            <stat-panel />
+            <stat-panel></stat-panel>
             <log-history
               v-bind:history="history"
             />

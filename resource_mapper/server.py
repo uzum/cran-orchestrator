@@ -51,7 +51,7 @@ class RMServer():
         return jsonify({ 'success': True })
 
     @resource_mapper.route("/topology/bbu-creation", methods=['POST'])
-    def onBBUMigration():
+    def onBBUCreation():
         RMServer.ref.onBBUCreation(request.args.get('address'))
         return jsonify({ 'success': True })
 

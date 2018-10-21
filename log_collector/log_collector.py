@@ -45,10 +45,9 @@ class LogCollector():
     def append(self, entry):
         # make sure that the most recent entry is always at the top of the list
         index = 0
-        while (entry['timestamp'] < self.history[index]['timestamp']):
+        while (len(self.history) > 0 and entry['timestamp'] < self.history[index]['timestamp']):
             index = index + 1
-            if (index > len(self.history)):
-                index = len(self.history)
+            if (index == len(self.history)):
                 break
 
         self.history.insert(index, entry)
@@ -80,7 +79,7 @@ class LogCollector():
                 stats['count'] = stats['count'] + 1
                 if (stats['count'] == limit): break
 
-                for attr, value in entry.__dict__.items():
+                for attr, value in entry.items():
                     if attr not in excludedAttrs:
                         if attr not in stats:
                             stats[attr] = {
