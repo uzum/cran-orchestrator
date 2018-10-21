@@ -43,7 +43,16 @@ class LogCollector():
         return index
 
     def append(self, entry):
-        self.history.insert(0, entry)
+        # make sure that the most recent entry is always at the top of the list
+        index = 0
+        while (entry['timestamp'] < self.history[index]['timestamp']):
+            index = index + 1
+            if (index > len(self.history)):
+                index = len(self.history)
+                break
+
+        self.history.insert(index, entry)
+
         for bbuName in self.watchlist['migration']:
             if (bbuName == entry.source):
                 self.RMAPI.notifyMigration(entry.address)
@@ -60,6 +69,30 @@ class LogCollector():
 
     def peek(self, timestamp = 0):
         return self.history[0:self.findLastSeen(timestamp)]
+
+    def stats(self, source, limit = 30):
+        excludedAttrs = ['address', 'source', 'timestamp']
+        stats = {
+            'count': 0
+        }
+        for entry in self.history:
+            if entry['source'] == source:
+                stats['count'] = stats['count'] + 1
+                if (stats['count'] == limit): break
+
+                for attr, value in entry.__dict__.items():
+                    if attr not in excludedAttrs:
+                        if attr not in stats:
+                            stats[attr] = {
+                                'mean': 0.0,
+                                'last5': []
+                            }
+                        # calculate mean
+                        stats[attr]['mean'] = ((stats[attr]['mean'] * (stats['count'] - 1)) + value) / stats['count']
+                        # put aside most recent 5 entries
+                        if (stats['count'] < 6):
+                            stats[attr]['last5'].append(value)
+        return stats
 
     def watch(self, list, name):
         self.watchlist[list].append(name)

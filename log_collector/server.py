@@ -19,6 +19,10 @@ class LCServer():
     def peek():
         return jsonify(LCServer.ref.peek(int(request.args.get('timestamp'))))
 
+    @log_collector.route("/stats", methods=['GET'])
+    def stats():
+        return jsonify(LCServer.ref.stats(request.args.get('source'), request.args.get('limit')))
+
     @log_collector.route("/append", methods=['POST'])
     def append():
         return jsonify(LCServer.ref.append(request.json))
