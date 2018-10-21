@@ -26,12 +26,12 @@ class UDPConnection():
     def sendPacket(self):
         self.send(self.createPayload())
         interval = nextTime(self.arrivalRate)
-        print("next packet from socket" + self.name + " will be sent in " + str(interval) + " seconds")
+        if (DEBUG): print("next packet from socket" + self.name + " will be sent in " + str(interval) + " seconds")
         self.nextPacketScheduler = Timer(interval, self.sendPacket)
         self.nextPacketScheduler.start()
 
     def send(self, message):
-        print('sending to ' + str(self.dstIP) + ':' + str(self.dstPort) + ' from ' + self.name)
+        if (DEBUG): print('sending to ' + str(self.dstIP) + ':' + str(self.dstPort) + ' from ' + self.name)
         self.socket.sendto(bytes(message, 'UTF-8'), (self.dstIP, self.dstPort))
         self.sequenceNumber = self.sequenceNumber + 1
 
@@ -45,7 +45,6 @@ class UDPConnection():
             self.sendPacket()
 
     def close(self):
-        print('closing socket ' + self.name)
         self.nextPacketScheduler.cancel()
         self.nextPacketScheduler = None
         self.socket.close()
@@ -60,7 +59,7 @@ class UDPConnection():
 
     def createPayload(self):
         packetSize = self.getPacketSize()
-        print('sending a packet with ' + str(packetSize) + ' bytes payload')
+        if (DEBUG): print('sending a packet with ' + str(packetSize) + ' bytes payload')
         return json.dumps({
             'name': self.name,
             'seq': self.sequenceNumber,
