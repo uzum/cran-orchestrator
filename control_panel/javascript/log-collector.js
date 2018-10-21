@@ -1,3 +1,7 @@
+const HISTORY_CAPACITY = 20;
+const PEEK_INTERVAL = 1000;
+const STATS_INTERVAL = 5000;
+
 const ColorCoder = (function(){
   const colorSet = ['primary', 'secondary', 'dark', 'light', 'info', 'warning', 'success', 'danger']
   const available = colorSet.slice(0);
@@ -65,6 +69,7 @@ Vue.component('log-history', {
   template: `
     <div class="history-container">
       <div class="row">
+        <b>log history</b>
         <div class="form-group">
           <input type="text" class="form-control" placeholder="Filter by ..." v-model="query">
         </div>
@@ -90,8 +95,113 @@ Vue.component('log-history', {
   }
 });
 
-const HISTORY_CAPACITY = 20;
-const PEEK_INTERVAL = 1000;
+Vue.component('stat-panel', {
+  data: function(){
+    return {
+      observedSources: [],
+      newSource: ''
+    }
+  },
+  template: `
+    <div class="row">
+      <div class="row">
+        <b>Source based statistics:</b>
+      </div>
+      <div class="row">
+        <source-stats
+          v-for="source in observedSources"
+          v-bind:key="source"
+          v-bind:source="source"
+          v-on:delete="delete(source)"
+        />
+        <div class="col-md">
+          <b>Observe source: </b>
+          <div class="input-group">
+            <input class="form-control" type="text" v-model="newSource" />
+            <div class="input-group-append">
+              <button class="btn btn-primary" type="button" v-on:click="observe">Observe</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `,
+  methods: {
+    observe: function(this.newSource){
+      this.observedSources.push(this.newSource);
+      this.newSource = '';
+    },
+    delete: function(source){
+      const idx = this.observedSources.lastIndexOf(source);
+      if (idx !== -1) {
+        this.observedSources.splice(idx, 1);
+      }
+    }
+  }
+});
+
+Vue.component('source-stats', {
+  props: ['source'],
+  data: function(){
+    return {
+      timeout: null,
+      stats: [],
+      dataCount: 0
+    };
+  }
+  template: `
+    <div class="col-md">
+      <h3 class="clearfix">
+        <span>{{ source }}</span>
+        <a><i class="fas fa-times float-right" style="cursor: pointer;" v-on:click="delete"></i></a>
+      </h3>
+      <p>stats for <b>{{ this.dataCount }}</b> data points:</p>
+      <ul>
+        <li v-for="stat in stats">
+          <h4>{{ stat.attr }}</h4>
+          <p>
+            <b>mean: </b><span>{{ stat.value['mean'] }}</span>
+          </p>
+          <p>
+            <b>last 5 point: </b><span>{{ stat.value['last5'].join(', ') }}</span>
+          </p>
+        </li>
+      </ul>
+    </div>
+  `,
+  created: function(){
+    this.update();
+  },
+  methods: {
+    update: function(){
+      axios.get(`${LCServerURL}/stats?source=${this.source}`)
+        .then((response) => {
+          // first empty the previous stats array
+          while (this.stats.length) this.stats.pop();
+
+          Object.keys(response.data).forEach(attr => {
+            if (attr === 'count') {
+              this.dataCount = response.data.count;
+              return;
+            }
+            this.stats.push({
+              attr,
+              value: response.data[attr]
+            });
+          });
+          this.timeout = setTimeout(this.update, STATS_INTERVAL);
+        })
+        .catch((error) => {
+          console.log(error);
+          this.timeout = setTimeout(this.update, STATS_INTERVAL);
+        });
+    },
+    delete: function(){
+      clearTimeout(this.timeout);
+      this.$emit('delete', this.source);
+    }
+  }
+});
 
 const LC = new Vue({
   el: '#lc-vue-app',
