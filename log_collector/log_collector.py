@@ -19,10 +19,10 @@ class RMAPI():
         return requests.post(self.pathPrefix + path, data=data, headers=headers)
 
     def notifyMigration(self, address):
-        return requestPost('/resource-mapper/topology/bbu-migration?address=' + address)
+        return self.requestPost('/resource-mapper/topology/bbu-migration?address=' + address, data = {})
 
     def notifyCreation(self, address):
-        return requestPost('/resource-mapper/topology/bbu-creation?address=' + address)
+        return self.requestPost('/resource-mapper/topology/bbu-creation?address=' + address, data = {})
 
 class LogCollector():
     CAPACITY = 1000

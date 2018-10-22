@@ -113,8 +113,7 @@ class Topology():
             for host in switch.hosts:
                 if (host.ip == ip):
                     return host.id
-        for switch in self.controllerNodeSwitch:
-            for host in switch.hosts:
-                if (host.ip == ip):
-                    return host.id
+        for host in self.controllerNodeSwitch.hosts:
+            if (host.ip == ip):
+                return host.id
         return None
