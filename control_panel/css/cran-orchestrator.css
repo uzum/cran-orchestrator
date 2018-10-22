@@ -1,3 +1,7 @@
 li.new-instance-item {
   display: inherit;
 }
+
+.source-stats-body {
+  font-size: 12px;
+}

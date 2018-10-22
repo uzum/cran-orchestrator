@@ -69,9 +69,14 @@ Vue.component('log-history', {
   template: `
     <div class="history-container">
       <div class="row">
-        <b>log history</b>
-        <div class="form-group">
-          <input type="text" class="form-control" placeholder="Filter by ..." v-model="query">
+        <h5>log history</h5>
+        <div class="row container">
+          <div class="col-md-3">
+            <b>Filter by: </b>
+            <div class="input-group">
+              <input type="text" class="form-control" v-model="query">
+            </div>
+          </div>
         </div>
       </div>
       <div class="row">
@@ -101,27 +106,26 @@ Vue.component('source-stats', {
     return {
       timeout: null,
       stats: [],
-      dataCount: 0
+      dataCount: 0,
+      hover: ''
     };
   },
   template: `
-    <div class="col-md">
-      <h3 class="clearfix">
-        <span>{{ source }}</span>
-        <a><i class="fas fa-times float-right" style="cursor: pointer;" v-on:click="removeSource"></i></a>
-      </h3>
-      <p>stats for <b>{{ this.dataCount }}</b> data points:</p>
-      <ul>
-        <li v-for="stat in stats">
-          <h4>{{ stat.attr }}</h4>
-          <p>
-            <b>mean: </b><span>{{ stat.value['mean'] }}</span>
-          </p>
-          <p>
-            <b>last 5 point: </b><span>{{ stat.value['last5'].join(', ') }}</span>
-          </p>
-        </li>
-      </ul>
+    <div class="col-md-3">
+      <div class="card border-danger">
+        <div class="card-header bg-danger">
+          <b>{{ source }}</b><span> (Data points: {{ this.dataCount }})</span>
+          <a><i class="fas fa-times float-right" style="cursor: pointer;" v-on:click="removeSource"></i></a>
+        </div>
+        <div class="card-body source-stats-body">
+          <div v-for="stat in stats">
+            <b v-on:mouseover="hover = stat.attr;">{{ stat.attr }}:</b><span> &mu; = {{ stat.value['mean'].toFixed(3) }}</span>
+            <div v-show="hover == stat.attr">
+              <span class="badge badge-light" v-for="value in stat.value['last5']"> {{ value.toFixed(3) }} </span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   `,
   created: function(){
@@ -167,17 +171,15 @@ Vue.component('stat-panel', {
   },
   template: `
     <div class="row">
-      <div class="row">
-        <b>Source based statistics:</b>
-      </div>
-      <div class="row">
+      <h5>source based statistics</h5>
+      <div class="row container">
         <source-stats
           v-for="source in observedSources"
           v-bind:key="source"
           v-bind:source="source"
           v-on:removal="remove(source)"
         ></source-stats>
-        <div class="col-md">
+        <div class="col-md-3">
           <b>Observe source: </b>
           <div class="input-group">
             <input class="form-control" type="text" v-model="newSource" />
