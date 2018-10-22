@@ -1,4 +1,5 @@
 import requests
+import time
 from .config import *
 
 class RMAPI():
@@ -43,14 +44,10 @@ class LogCollector():
         return index
 
     def append(self, entry):
-        # make sure that the most recent entry is always at the top of the list
-        index = 0
-        while (len(self.history) > 0 and entry['timestamp'] < self.history[index]['timestamp']):
-            index = index + 1
-            if (index == len(self.history)):
-                break
-
-        self.history.insert(index, entry)
+        now = int(time.time())
+        entry['logLatency'] = now - entry['timestamp']
+        entry['timestamp'] = now
+        self.history.insert(0, entry)
 
         for bbuName in self.watchlist['migration']:
             if (bbuName == entry.source):
