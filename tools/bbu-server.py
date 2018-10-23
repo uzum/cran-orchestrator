@@ -78,7 +78,7 @@ class Allocator():
 
 UDP_LISTEN_PORT = 3000
 REPORT_INTERVAL = 2.0
-GATEWAY_ADDRESS = 10.0.0.2
+GATEWAY_ADDRESS = '10.0.0.2'
 IP_ADDRESS = subprocess.check_output(['hostname', '-I']).decode().split(' ')[0]
 
 parser = argparse.ArgumentParser()
