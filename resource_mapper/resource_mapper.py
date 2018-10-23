@@ -4,6 +4,7 @@ from .group import Group
 from .config import *
 from .topology import Topology
 import os
+from threading import Timer
 
 class Mapping():
     nextMappingId = 0
@@ -239,10 +240,14 @@ class ResourceMapper():
         mapping.groups = []
         self.addMappingRules(mapping)
 
-    def onBBUMigration(self, address):
-        previousId = self.topology.getHostIdByIP(address)
+    def onBBUMigration(self, address, previousId = None):
+        if (previousId == None):
+            previousId = self.topology.getHostIdByIP(address)
+
         if (os.system('ping -c 1 ' + address) != 0):
             print('new bbu is still unreachable')
+            timer = Timer(5.0, self.onBBUMigration, (address, previousId))
+            timer.start()
             return False
 
         self.topology.discover(self.ODLAPI.topology())
@@ -250,11 +255,12 @@ class ResourceMapper():
 
         if (newId == None):
             print('could not find the migrated instance address in ODL topology')
+            timer = Timer(5.0, self.onBBUMigration, (address, previousId))
+            timer.start()
             return False
 
         if (newId == previousId):
             print('host id did not change for bbu at ' + address + ' after migration')
-            return False
 
         for mapping in self.mappings:
             if previousId in mapping.bbuList:

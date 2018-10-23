@@ -4,7 +4,7 @@ const STATS_INTERVAL = 5000;
 
 const ColorCoder = (function(){
   const colorSet = ['primary', 'secondary', 'dark', 'light', 'info', 'warning', 'success', 'danger']
-  const available = colorSet.slice(0);
+  let available = colorSet.slice(0);
   const assignments = new Map();
 
   return {
