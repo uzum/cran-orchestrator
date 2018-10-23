@@ -51,13 +51,13 @@ class LogCollector():
         self.history.insert(0, entry)
 
         for bbuName in self.watchlist['migration']:
-            if (bbuName == entry.source):
-                self.RMAPI.notifyMigration(entry.address)
+            if (bbuName == entry['source']):
+                self.RMAPI.notifyMigration(entry['address'])
                 self.watchlist['migration'].remove(bbuName)
 
         for bbuName in self.watchlist['creation']:
-            if (bbuName == entry.source):
-                self.RMAPI.notifyCreation(entry.address)
+            if (bbuName == entry['source']):
+                self.RMAPI.notifyCreation(entry['address'])
                 self.watchlist['creation'].remove(bbuName)
 
         if (len(self.history) > LogCollector.CAPACITY):
