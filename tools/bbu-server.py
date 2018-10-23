@@ -78,6 +78,7 @@ class Allocator():
 
 UDP_LISTEN_PORT = 3000
 REPORT_INTERVAL = 2.0
+GATEWAY_ADDRESS = 10.0.0.2
 IP_ADDRESS = subprocess.check_output(['hostname', '-I']).decode().split(' ')[0]
 
 parser = argparse.ArgumentParser()
@@ -97,6 +98,8 @@ server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 server_socket.bind(('', UDP_LISTEN_PORT))
 
 def report():
+    # ping gateway in each report interval to trigger LLDP after migration/creation
+    os.system('ping -c 1 ' + GATEWAY_ADDRESS)
     try:
         cpuUtilization = round(float(os.popen('''grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage }' ''').readline()))
         total, used, free = list(map(int, os.popen('free -t -m').readlines()[-1].split()[1:]))
