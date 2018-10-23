@@ -1,5 +1,6 @@
 import requests
 import time
+from threading import Timer
 from .config import *
 
 class RMAPI():
@@ -91,4 +92,8 @@ class LogCollector():
         return stats
 
     def watch(self, list, name):
-        self.watchlist[list].append(name)
+        # introduce a grace period before registering because there may be in-progress packets coming through
+        def register():
+            self.watchlist[list].append(name)
+        timer = Timer(5.0, register)
+        timer.start()
