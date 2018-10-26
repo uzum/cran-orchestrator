@@ -266,7 +266,9 @@ class ResourceMapper():
             if previousId in mapping.bbuList:
                 # update the bbu id in the mapping list and re-create openflow flows&groups
                 mapping.bbuList = [newId if bbuId == previousId else bbuId for bbuId in mapping.bbuList]
-                self.updateMapping(mapping)
+            # update mapping even if the migrated bbu is not in the bbu list
+            # because it's IP could being used as a forwarding address for other rules
+            self.updateMapping(mapping)
         return True
 
     def onBBUCreation(self, address):
