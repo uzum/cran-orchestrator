@@ -102,7 +102,7 @@ class Flow():
         self.id = Flow.nextFlowId
         Flow.nextFlowId = Flow.nextFlowId + 1
 
-    def xml(self, operation, pretty=False):
+    def xml(self, operation = None, pretty=False):
         flow_xml = tostring(E.input(
             E.barrier('false'),
             getTargetSwitch(self.options.get('switch')),
@@ -120,8 +120,8 @@ class Flow():
            ), xml_declaration=True, encoding='UTF-8', pretty_print=pretty)
         file_name = str(self.id) + ".flow"
         if operation == 'add':
-            with open("flows/"+file_name, "w") as text_file:
-                text_file.write(flow_xml)
+            with open("/home/ubuntu/cran-orchestrator/flows/"+file_name, "w") as text_file:
+                text_file.write(str(flow_xml))
         if operation == 'remove':
             try:
                 os.remove("flows/"+file_name)

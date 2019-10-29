@@ -12,4 +12,4 @@ ODL_USERNAME = 'admin'
 ODL_PASSWORD = 'admin'
 
 RM_SERVICE_PORT = 5002
-BROADCAST_ADDRESS = '10.0.0.2' # broadcast address of private subnet
+BROADCAST_ADDRESS = '10.0.0.2' # broadcast address of private subnet	

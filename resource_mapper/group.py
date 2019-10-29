@@ -54,7 +54,7 @@ class Group():
         self.id = Group.nextGroupId
         Group.nextGroupId = Group.nextGroupId + 1
 
-    def xml(self,operation):
+    def xml(self,operation = None):
         flow_xml = tostring(E.input(
             E.barrier('false'),
             getTargetSwitch(self.options.get('switch')),
@@ -66,8 +66,8 @@ class Group():
            ), xml_declaration=True, encoding='UTF-8')
         file_name = str(self.id) + ".group_flow"
         if operation == 'add':
-            with open("flows/"+file_name, "w") as text_file:
-                text_file.write(flow_xml)
+            with open("/home/ubuntu/cran-orchestrator/flows/"+file_name, "w") as text_file:
+                text_file.write(str(flow_xml))
         if operation == 'remove':
             try:
                 os.remove("flows/"+file_name)
