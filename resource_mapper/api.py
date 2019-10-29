@@ -51,19 +51,23 @@ class ODLRestConfAPI():
         return None
 
     def addFlow(self, flow):
-        return self.requestPost('/restconf/operations/sal-flow:add-flow', flow.xml())
+        operation = 'add'
+        return self.requestPost('/restconf/operations/sal-flow:add-flow', flow.xml(operation))
 
     def removeFlow(self, flow):
-        return self.requestPost('/restconf/operations/sal-flow:remove-flow', flow.xml())
+        operation = 'remove'
+        return self.requestPost('/restconf/operations/sal-flow:remove-flow', flow.xml(operation))
 
     def listFlows(self):
         return None
 
     def addGroup(self, group):
-        return self.requestPost('/restconf/operations/sal-group:add-group', group.xml())
+        operation = 'add'
+        return self.requestPost('/restconf/operations/sal-group:add-group', group.xml(operation))
 
     def removeGroup(self, group):
-        return self.requestPost('/restconf/operations/sal-group:remove-group', group.xml())
+        operation = 'remove'
+        return self.requestPost('/restconf/operations/sal-group:remove-group', group.xml(operation))
 
     def listGroups(self):
         return None

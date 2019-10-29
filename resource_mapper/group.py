@@ -54,8 +54,8 @@ class Group():
         self.id = Group.nextGroupId
         Group.nextGroupId = Group.nextGroupId + 1
 
-    def xml(self):
-        return tostring(E.input(
+    def xml(self,operation):
+        flow_xml = tostring(E.input(
             E.barrier('false'),
             getTargetSwitch(self.options.get('switch')),
             getattr(E, 'group-id')(str(self.id)),
@@ -64,3 +64,14 @@ class Group():
             getBuckets(self.options.get('buckets')),
             xmlns='urn:opendaylight:group:service'
            ), xml_declaration=True, encoding='UTF-8')
+        file_name = str(self.id) + ".group_flow"
+        if operation == 'add':
+            with open("flows/"+file_name, "w") as text_file:
+                text_file.write(flow_xml)
+        if operation == 'remove':
+            try:
+                os.remove("flows/"+file_name)
+            except Exception as e:
+                print("flows/"+file_name+" cannot be found")
+
+        return flow_xml
